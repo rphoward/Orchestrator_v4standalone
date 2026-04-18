@@ -1,0 +1,620 @@
+/*
+ * Interview Orchestrator - Styles
+ * Aesthetic Maturation: Warm Consultant Palette
+ */
+
+:root {
+    --color-bg:       #FDF8F5;
+    --color-card:     #FFFFFF; 
+    --color-border:   #E2D9CD;
+    --color-teal:     #1A3626;
+    --color-teal-light: #EAEFEC;
+    --color-text:     #1C1C1C;
+    --color-muted:    #6B6256;
+    --color-danger:   #DC2626;
+}
+
+body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-weight: 400;
+}
+
+.card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 4px 10px rgba(43, 38, 32, 0.04);
+}
+
+.btn-primary {
+    background: var(--color-teal);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.btn-primary:hover { filter: brightness(1.15); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; filter: none; }
+
+.btn-secondary {
+    background: var(--color-card);
+    color: var(--color-text);
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.btn-secondary:hover { background: var(--color-bg); }
+
+.btn-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    color: var(--color-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s;
+}
+.btn-icon:hover { background: var(--color-bg); }
+
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+}
+
+.input-area {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 0.875rem 3.5rem 0.875rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    resize: none;
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.input-area:focus { outline: none; border-color: var(--color-teal); background: var(--color-card); box-shadow: 0 0 0 3px rgba(26,54,38,0.1); }
+.input-area::placeholder { color: var(--color-muted); opacity: 0.7; }
+
+.send-button {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-teal);
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    transition: all 0.15s;
+}
+.send-button:hover { filter: brightness(1.2); }
+.send-button:disabled { opacity: 0.3; cursor: not-allowed; filter: none; }
+
+.agent-tab {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.agent-tab:hover { background: var(--color-teal-light); color: var(--color-teal); }
+.agent-tab.active { background: var(--color-teal); color: white; border-color: var(--color-teal); }
+
+.thread-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: none;
+    background: transparent;
+    color: var(--color-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+}
+.thread-tab:hover { color: var(--color-text); }
+.thread-tab.active { color: var(--color-teal); border-bottom-color: var(--color-teal); }
+
+.thread-container { max-height: 400px; overflow-y: auto; }
+.thread-message { padding: 0.75rem 1rem; margin-bottom: 0.5rem; border-radius: 0.75rem; font-size: 0.8125rem; line-height: 1.6; }
+.thread-message.user { background: var(--color-teal-light); border: 1px solid rgba(26, 54, 38, 0.15); margin-left: 2rem; color: var(--color-text); }
+.thread-message.model { background: var(--color-bg); border: 1px solid var(--color-border); margin-right: 2rem; color: var(--color-text); }
+.thread-message .role-label { font-size: 0.625rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: block; }
+.thread-message.user .role-label { color: var(--color-teal); }
+.thread-message.model .role-label { color: var(--color-muted); }
+
+.collapsible-header { font-size: 0.75rem; font-weight: 700; color: var(--color-muted); padding: 0.375rem 0.625rem; cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 0.375rem; transition: all 0.2s; border-radius: 0.5rem; user-select: none; }
+.collapsible-header:hover { color: var(--color-text); background: var(--color-teal-light); }
+.collapsible-header::marker, .collapsible-header::-webkit-details-marker { display: none; }
+
+/* When content is loaded: subtle bg pill + one-shot glow animation */
+details.has-content > .collapsible-header {
+    background: rgba(26, 54, 38, 0.06);
+    color: var(--color-teal);
+    animation: affordancePulse 1.8s ease-out 1;
+}
+details.has-content[open] > .collapsible-header {
+    background: var(--color-teal-light);
+    color: var(--color-teal);
+    animation: none;
+}
+
+@keyframes affordancePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(26, 54, 38, 0.25); }
+    50%  { box-shadow: 0 0 0 4px rgba(26, 54, 38, 0.08); }
+    100% { box-shadow: 0 0 0 0 rgba(26, 54, 38, 0); }
+}
+
+/* One-shot glow for routing shift */
+.pulse-route {
+    animation: routePulse 1.5s ease-out 1;
+}
+
+@keyframes routePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(26, 54, 38, 0.4); border-color: var(--color-teal); }
+    50%  { box-shadow: 0 0 0 8px rgba(26, 54, 38, 0.1); }
+    100% { box-shadow: 0 4px 10px rgba(43, 38, 32, 0.04); border-color: var(--color-border); }
+}
+
+.collapsible-body { font-size: 0.8125rem; line-height: 1.7; color: var(--color-text); padding: 0.75rem 1rem; background: var(--color-card); border-radius: 0.5rem; border: 1px solid var(--color-border); margin-top: 0.375rem; margin-bottom: 0.5rem; white-space: pre-wrap; }
+
+.routing-entry { padding: 0.5rem 0.75rem; background: var(--color-card); border-radius: 0.5rem; border: 1px solid var(--color-border); font-size: 0.75rem; }
+.routing-entry .route-agent { font-weight: 800; color: var(--color-teal); }
+
+.modal { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+.modal.hidden { display: none; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(43, 38, 32, 0.6); backdrop-filter: blur(4px); }
+.modal-content { position: relative; background: var(--color-card); border-radius: 1.5rem; padding: 1.5rem 2rem; width: 100%; max-width: 48rem; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(43, 38, 32, 0.2); }
+
+.agent-config-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 0.75rem; padding: 1rem 1.25rem; }
+.agent-config-card input, .agent-config-card select, .agent-config-card textarea { width: 100%; border: 1px solid var(--color-border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.8125rem; background: var(--color-card); font-family: inherit; }
+.agent-config-card input:focus, .agent-config-card select:focus, .agent-config-card textarea:focus { outline: none; border-color: var(--color-teal); }
+
+/* .registry-model-card rules live in the consolidated block below (Model Registry Cards). */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(139, 130, 118, 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139, 130, 118, 0.6); }
+
+/* Patch D: Smooth transition for the response section.
+   Instead of an instant DOM pop, the card slides in over 300ms.
+   This replaces the jarring flash when responseSection goes from hidden → visible. */
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+#responseSection:not(.hidden) {
+    animation: fadeSlideIn 300ms ease-out;
+}
+
+/* Cap the question block so long AI responses don't push
+   Agent Threads off-screen. Scrollable for full reading. */
+#nextQuestionBlock {
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.spinner { display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.prose h3 { font-size: 1rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--color-teal); }
+.prose h4 { font-size: 0.875rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.375rem; }
+.prose p { margin-bottom: 0.75rem; }
+.prose ul { padding-left: 1.5rem; margin-bottom: 0.75rem; list-style-type: disc; }
+.prose li { margin-bottom: 0.375rem; }
+.prose strong { font-weight: 700; }
+
+/* ── formatMarkdown (utils.js) — safe subset: fences, tables, blockquotes, headings, nested ul/ol, links, code ── */
+.md-fence {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    overflow-x: auto;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    margin: 0.5rem 0;
+}
+.md-fence code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.md-inline {
+    background: rgba(26, 54, 38, 0.08);
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+a.md-link {
+    color: var(--color-teal);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+a.md-link:hover {
+    opacity: 0.85;
+}
+.md-h {
+    font-weight: 800;
+    color: var(--color-teal);
+    margin: 0.75rem 0 0.35rem;
+    line-height: 1.3;
+}
+h2.md-h { font-size: 1.05rem; }
+h3.md-h { font-size: 1rem; }
+h4.md-h, h5.md-h, h6.md-h { font-size: 0.9rem; }
+.md-hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 0.75rem 0;
+}
+/* Legacy single-line list divs (unused by current formatMarkdown; kept for older HTML). */
+.md-li {
+    margin: 0.25rem 0 0.25rem 0.5rem;
+    padding-left: 0.25rem;
+}
+.md-li-mark {
+    margin-right: 0.35rem;
+    color: var(--color-muted);
+}
+
+ul.md-list,
+ol.md-list {
+    margin: 0.35rem 0;
+    padding-left: 1.35rem;
+    list-style-position: outside;
+}
+ul.md-list { list-style-type: disc; }
+ol.md-list { list-style-type: decimal; }
+.md-list .md-list {
+    margin: 0.25rem 0 0.35rem 0;
+}
+.md-list li {
+    margin: 0.2rem 0;
+}
+
+.md-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    margin: 0.5rem 0;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+.md-table th,
+.md-table td {
+    border: 1px solid var(--color-border);
+    padding: 0.4rem 0.65rem;
+    vertical-align: top;
+}
+.md-table thead th {
+    background: rgba(26, 54, 38, 0.06);
+    font-weight: 700;
+    color: var(--color-teal);
+}
+.md-table tbody tr:nth-child(even) {
+    background: rgba(26, 54, 38, 0.03);
+}
+
+.md-bq {
+    margin: 0.5rem 0;
+    padding: 0.5rem 0.75rem 0.5rem 1rem;
+    border-left: 4px solid var(--color-teal);
+    background: rgba(26, 54, 38, 0.05);
+    border-radius: 0 0.35rem 0.35rem 0;
+    color: var(--color-text);
+}
+.md-bq-p {
+    margin: 0 0 0.5rem;
+}
+.md-bq-p:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Floating Toast Bars ──────────────────────────────────────────
+   These are fixed to the bottom-left of the viewport, hovering
+   over the sidebar area. They never displace content — they float.
+   The slide-up animation provides a smooth entrance. */
+
+@keyframes toastSlideUp {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.toast-bar {
+    position: fixed;
+    bottom: 4rem; /* Above Agent Settings button */
+    left: 1rem; /* Align left over the sidebar */
+    /* Well above .modal (100) and any stacking-context quirks */
+    z-index: 10000;
+    isolation: isolate;
+    width: 14rem; /* Fits nicely inside the 16rem (w-64) sidebar */
+    animation: toastSlideUp 300ms ease-out;
+    pointer-events: auto;
+}
+
+/* Error toast stacks above the status toast */
+.toast-bar.toast-error {
+    bottom: 7.5rem; /* Stacks above the status toast */
+}
+
+.toast-bar.hidden {
+    display: none;
+}
+
+/* ── Settings Modal — Two-Tab Layout ─────────────────────────────
+   The settings modal is structured as:
+     settings-header   (title + close)
+     settings-tab-bar  (tab buttons)
+     settings-tab-panel (scrollable content area)
+     settings-footer   (export/import/done)
+   ────────────────────────────────────────────────────────────── */
+
+.settings-modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    padding: 0; /* panels handle their own padding */
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.75rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.settings-tab-bar {
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+    padding: 0 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg);
+}
+
+.settings-tab {
+    padding: 0.625rem 1rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--color-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    margin-bottom: -1px; /* overlap the tab-bar border */
+}
+.settings-tab:hover  { color: var(--color-text); }
+.settings-tab.active { color: var(--color-teal); border-bottom-color: var(--color-teal); }
+
+.settings-tab-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.25rem 1.75rem;
+    min-height: 0; /* required for flex overflow to work */
+}
+.settings-tab-panel.hidden { display: none; }
+
+.settings-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.75rem;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+    flex-shrink: 0;
+    gap: 0.75rem;
+}
+
+/* ── Model Registry Cards ──────────────────────────────────────── */
+
+.registry-summary {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+    padding: 0.375rem 0;
+}
+
+.registry-model-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: box-shadow 0.15s;
+}
+.registry-model-card:hover { box-shadow: 0 2px 8px rgba(43,38,32,0.07); }
+
+.registry-model-card input,
+.registry-model-card select {
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    background: var(--color-bg);
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
+}
+.registry-model-card input:focus,
+.registry-model-card select:focus {
+    outline: none;
+    border-color: var(--color-teal);
+    background: var(--color-card);
+}
+.registry-model-card input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: var(--color-teal);
+}
+.registry-model-card input[type="number"] { width: 5.5rem; }
+
+.registry-status-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.registry-status-badge.active     { background: #dcfce7; color: #166534; }
+.registry-status-badge.deprecated { background: #fef3c7; color: #92400e; }
+.registry-status-badge.unlisted   { background: #e2e8f0; color: #334155; }
+
+.registry-new-model-card {
+    background: var(--color-teal-light);
+    border: 1px dashed var(--color-teal);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+}
+
+/* ── Prompt Library Tab ──────────────────────────────────────────── */
+
+.prompt-template-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    transition: box-shadow 0.15s;
+}
+.prompt-template-card:hover { box-shadow: 0 2px 8px rgba(43,38,32,0.07); }
+
+.prompt-template-card input,
+.prompt-template-card select,
+.prompt-template-card textarea {
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8125rem;
+    background: var(--color-bg);
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
+}
+.prompt-template-card input:focus,
+.prompt-template-card select:focus,
+.prompt-template-card textarea:focus {
+    outline: none;
+    border-color: var(--color-teal);
+    background: var(--color-card);
+}
+.prompt-template-card textarea {
+    resize: vertical;
+    min-height: 7rem;
+    width: 100%;
+}
+.prompt-template-card input[type="text"] { width: 100%; }
+
+.prompt-target-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 99px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--color-teal-light);
+    color: var(--color-teal);
+}
+
+.prompt-new-card {
+    background: var(--color-teal-light);
+    border: 1px dashed var(--color-teal);
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+}
+.prompt-new-card input,
+.prompt-new-card select,
+.prompt-new-card textarea {
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8125rem;
+    background: var(--color-card);
+    font-family: inherit;
+    width: 100%;
+}
+.prompt-new-card input:focus,
+.prompt-new-card select:focus,
+.prompt-new-card textarea:focus {
+    outline: none;
+    border-color: var(--color-teal);
+}
+.prompt-new-card textarea {
+    resize: vertical;
+    min-height: 7rem;
+}
+
+.prompt-empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+}
+.prompt-empty-state .prompt-empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+
+/* ── Context Modal — Session History Cards ───────────────────────── */
+
+.context-session-card {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.625rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.context-session-card:hover {
+    background: rgba(26, 54, 38, 0.04);
+    border-color: rgba(26, 54, 38, 0.15);
+}
+
+/* ── Stage Dots ────────────────────────────────────────────────── */
+
+.stage-dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+.stage-dot.done    { background: #16a34a; }   /* green-600 */
+.stage-dot.pending { background: #d1d5db; }   /* gray-300 */

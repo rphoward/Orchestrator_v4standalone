@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orchestrator-v4"
+version = "0.1.0"
+description = "Orchestrator 4 — Flask interview orchestration (Clean Architecture)"
+readme = "DEV-STANDALONE.md"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1.3",
+    "google-genai>=1.56.0",
+    "python-dotenv>=1.2.1",
+]
+
+# Map import name `orchestrator_v4` to this directory (standalone tree layout).
+[tool.setuptools]
+package-dir = { "orchestrator_v4" = "." }
+packages = [
+    "orchestrator_v4",
+    "orchestrator_v4.core",
+    "orchestrator_v4.core.entities",
+    "orchestrator_v4.core.ports",
+    "orchestrator_v4.core.use_cases",
+    "orchestrator_v4.infrastructure",
+    "orchestrator_v4.infrastructure.persistence",
+    "orchestrator_v4.presentation",
+]
+
+[tool.uv]
+managed = true

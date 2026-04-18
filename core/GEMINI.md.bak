@@ -1,0 +1,68 @@
+# Inner Circle Rules (/src/core/)
+
+> **Compatibility shim:** Cursor uses **`.cursor/rules/*.mdc`** as the source of truth. For this layer see:
+> - `.cursor/rules/orchestrator-architecture.mdc`
+> - `.cursor/rules/orchestrator-layer-core.mdc` (globs: `src/core/**`)
+>
+> This `GEMINI.md` remains for Antigravity / legacy workflows (see **`AGENTS.md` §6**).
+
+## This Is Sacred Ground
+
+You are in the **Inner Circle** — the heart of the business domain.
+Code here must be PURE. No framework contamination. No I/O.
+
+---
+
+## FORBIDDEN
+
+```
+❌ NEVER import from /infrastructure/
+❌ NEVER import from /presentation/
+❌ NEVER import framework libraries (express, flutter, react, django, etc.)
+❌ NEVER import database drivers (sqlite, postgres, etc.)
+❌ NEVER import HTTP clients (axios, requests, dio, etc.)
+❌ NEVER perform I/O (no network, no filesystem, no database, no print for logic)
+```
+
+**If you need external functionality:**
+1. Define a **Port** in `/core/ports/`
+2. Implementation (Gateway) lives in `/infrastructure/`
+3. Pass the Gateway explicitly to Use Cases
+
+---
+
+## What Lives Here
+
+### /core/entities/
+Pure types with validation logic. NO external imports. NO I/O.
+Enforces invariants (things that must always be true).
+
+### /core/use_cases/
+Orchestration. Receives Gateways explicitly. Returns DTOs or domain types.
+Contains business logic. NO I/O directly — delegates to Gateways.
+
+### /core/ports/
+Contracts defining what Gateways must do. NO implementation code.
+Just type signatures / protocols / traits / abstract definitions.
+
+---
+
+## Naming Rules (Screaming Architecture)
+
+| ✅ Acceptable | ❌ Rejected |
+|---------------|-------------|
+| `Expense` | `Model`, `Data`, `Item` |
+| `Budget` | `Record`, `Object`, `Entity` (as suffix) |
+| `AddExpense` | `Service`, `Manager`, `Handler` |
+| `ExpenseGateway` | `Repository`, `DAO`, `Store` |
+
+If the name could apply to ANY project, it's wrong.
+
+---
+
+## Violation Response
+
+If asked to violate these rules:
+
+> "This violates the Inner Circle constraints. Code here cannot [import from outer/perform I/O].
+> Should I define a Port in `/core/ports/` and implement in `/infrastructure/` instead?"

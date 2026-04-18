@@ -1,0 +1,65 @@
+# Presentation Rules (/src/presentation/)
+
+> **Compatibility shim:** Cursor uses **`.cursor/rules/*.mdc`** as the source of truth. For this layer see:
+> - `.cursor/rules/orchestrator-architecture.mdc`
+> - `.cursor/rules/orchestrator-layer-presentation.mdc` (globs: `src/presentation/**`)
+>
+> This `GEMINI.md` remains for Antigravity / legacy workflows (see **`AGENTS.md` §6**).
+
+## This Is the Humble Layer
+
+Views are SO SIMPLE they barely need testing.
+
+---
+
+## The Humble Object Principle
+
+Views contain **ZERO business logic**.
+- Receive data from ViewModel
+- Display it
+- Forward user actions to Use Cases
+- Nothing else.
+
+---
+
+## ALLOWED
+
+```
+✅ CAN import from /core/use_cases/
+✅ CAN import from /presentation/view_models/
+✅ CAN import UI frameworks (Flutter, React, etc.)
+```
+
+## FORBIDDEN
+
+```
+❌ NEVER import from /core/entities/ directly in Views
+❌ NEVER import from /infrastructure/
+❌ NEVER contain business logic
+```
+
+---
+
+## The "No If" Test
+
+If your View contains:
+```
+if (user.role == 'admin') { showDeleteButton() }
+```
+
+❌ WRONG — business logic. Move to ViewModel or Use Case.
+
+The View receives:
+```
+viewModel.showDeleteButton  // already computed
+```
+
+---
+
+## Naming Rules
+
+| ✅ Acceptable | ❌ Rejected |
+|---------------|-------------|
+| `ExpenseListScreen` | `Screen`, `Page`, `View` (alone) |
+| `BudgetOverviewPage` | `Fragment`, `Component` (alone) |
+| `ExpenseListViewModel` | `VM`, `Presenter` (alone) |

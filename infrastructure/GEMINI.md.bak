@@ -1,0 +1,52 @@
+# Infrastructure Rules (/src/infrastructure/)
+
+> **Compatibility shim:** Cursor uses **`.cursor/rules/*.mdc`** as the source of truth. For this layer see:
+> - `.cursor/rules/orchestrator-architecture.mdc`
+> - `.cursor/rules/orchestrator-layer-infrastructure.mdc` (globs: `src/infrastructure/**`)
+>
+> This `GEMINI.md` remains for Antigravity / legacy workflows (see **`AGENTS.md` §6**).
+
+## This Is the "Dirty" Layer
+
+Implements contracts from `/core/ports/`. Frameworks and I/O allowed here.
+
+---
+
+## ALLOWED
+
+```
+✅ CAN import from /core/ports/ (to implement contracts)
+✅ CAN import from /core/entities/ (to work with domain types)
+✅ CAN import framework libraries
+✅ CAN import database drivers
+✅ CAN perform I/O (this is WHERE I/O lives)
+```
+
+## FORBIDDEN
+
+```
+❌ NEVER import from /presentation/
+❌ NEVER import from /core/use_cases/
+```
+
+---
+
+## Naming Rules
+
+Names must include BOTH the technology AND the domain concept:
+
+| ✅ Acceptable | ❌ Rejected |
+|---------------|-------------|
+| `SqliteExpenseGateway` | `Gateway`, `Repository` |
+| `InMemoryBudgetGateway` | `Store`, `DAO` |
+| `OpenWeatherClient` | `ApiClient`, `Http` |
+| `LocalFileConfigSource` | `ConfigLoader` |
+
+---
+
+## Implementation Contract
+
+Every Gateway here MUST:
+1. Implement a Port from `/core/ports/`
+2. Be stateless or manage its own state (no hidden globals)
+3. Be swappable (could replace SQLite with Postgres without touching `/core/`)
