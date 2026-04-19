@@ -4,9 +4,11 @@
  */
 
 :root {
-    --color-bg:       #FDF8F5;
-    --color-card:     #FFFFFF; 
-    --color-border:   #E2D9CD;
+    --font-display: 'Fraunces', serif;
+    --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    --color-bg:       #F5ECD8;
+    --color-card:     #FBF5E9;
+    --color-border:   #D8CBB4;
     --color-teal:     #1A3626;
     --color-teal-light: #EAEFEC;
     --color-text:     #1C1C1C;
@@ -17,7 +19,38 @@
 body {
     background: var(--color-bg);
     color: var(--color-text);
+    font-family: var(--font-body);
     font-weight: 400;
+}
+
+.t-display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.t-display-italic {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 160px 160px;
+}
+
+/* Keep daily-driver chrome above the grain layer (body::before z-index: 0). */
+body > aside,
+body > .flex-1 {
+    position: relative;
+    z-index: 1;
 }
 
 .card {
@@ -96,7 +129,7 @@ body {
 
 .section-label {
     font-size: 0.7rem;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-muted);
@@ -264,6 +297,12 @@ details.has-content[open] > .collapsible-header {
 #nextQuestionBlock {
     max-height: 40vh;
     overflow-y: auto;
+}
+
+#nextQuestion {
+    font-size: 1.125rem;
+    line-height: 1.45;
+    letter-spacing: -0.02em;
 }
 
 .spinner { display: inline-block; width: 1rem; height: 1rem; border: 2px solid white; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }

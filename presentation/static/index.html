@@ -4,25 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Orchestrator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        themeBg: '#FDF8F5',
-                        themeSurface: '#FFFFFF',
+                        themeBg: '#F5ECD8',
+                        themeSurface: '#FBF5E9',
                         themeText: '#1C1C1C',
                         themeAccent: '#1A3626',
                         themeBorder: '#E2D9CD',
                         themeMuted: '#6B6256',
                         themeDanger: '#DC2626'
+                    },
+                    fontFamily: {
+                        sans: ['"IBM Plex Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        display: ['Fraunces', 'serif']
                     }
                 }
             }
         }
     </script>
-    <link rel="stylesheet" href="/static/style.css?v=20">
+    <link rel="stylesheet" href="/static/style.css?v=23">
 </head>
 <body class="bg-themeBg text-themeText min-h-screen flex font-sans">
 
@@ -69,9 +76,9 @@
             <div class="flex items-center gap-3">
                 <button class="md:hidden text-2xl text-themeMuted" onclick="document.getElementById('sidebar').classList.toggle('hidden')">☰</button>
                 <div class="min-w-0">
-                    <h2 id="currentSessionTitle" class="text-lg font-bold text-themeText truncate max-w-[200px] md:max-w-2xl">Select a Session</h2>
+                    <h2 id="currentSessionTitle" class="t-display text-lg text-themeText truncate max-w-[200px] md:max-w-2xl">Select a Session</h2>
                     <div class="flex items-center gap-2">
-                        <p class="text-xs text-themeMuted font-medium tracking-wide uppercase">Discovery Co-Pilot</p>
+                        <p class="t-display-italic text-xs text-themeMuted font-medium tracking-wide uppercase">Discovery Co-Pilot</p>
                         <span id="currentStageBadge" class="hidden px-2 py-0.5 rounded-full bg-themeAccent text-white text-[10px] font-bold uppercase tracking-tighter">Stage: 1</span>
                         <div id="headerStageDots" class="hidden flex items-center gap-1 border-l border-themeBorder pl-2 ml-1"></div>
                     </div>
@@ -101,7 +108,7 @@
 
             <div id="welcomeSection" class="card text-center py-16 mt-8 shadow-sm hidden">
                 <p class="text-5xl mb-6">☕</p>
-                <h2 class="text-2xl font-bold text-themeText mb-3">Ready for Discovery</h2>
+                <h2 class="t-display text-2xl text-themeText mb-3">Ready for Discovery</h2>
                 <p class="text-themeMuted mb-8 max-w-md mx-auto text-sm leading-relaxed">
                     Start a new session to initialize your AI agents. They'll prepare opening questions to organically guide the linear discovery workflow.
                 </p>
@@ -177,7 +184,7 @@
                             <span class="text-themeMuted truncate" id="routeReason"></span>
                         </div>
                         <div id="nextQuestionBlock" class="bg-themeAccent/5 rounded-lg p-3 mb-2 border border-themeAccent/15">
-                            <p class="text-sm text-neutral-600 leading-snug" id="nextQuestion"></p>
+                            <p class="t-display text-sm text-neutral-600 leading-snug" id="nextQuestion"></p>
                         </div>
                         <div class="flex gap-4">
                             <details class="group"><summary class="collapsible-header text-xs">🧠 Analysis</summary><div class="collapsible-body text-sm" id="analysisContent"></div></details>

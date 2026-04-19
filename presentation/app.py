@@ -30,6 +30,14 @@ from orchestrator_v4.presentation.prompt_template_routes import (
 
 _STATIC_DIR = pathlib.Path(__file__).resolve().parent / "static"
 
+# Ensure our orchestrator_v4.* INFO lines reach the console in dev; basicConfig
+# is a no-op if the root logger already has handlers (so this does not fight Flask).
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+)
+logging.getLogger("orchestrator_v4").setLevel(logging.INFO)
+
 app = Flask(__name__, static_folder=str(_STATIC_DIR), static_url_path="/static")
 app.logger.setLevel(logging.INFO)
 

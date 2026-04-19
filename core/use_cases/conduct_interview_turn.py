@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from orchestrator_v4.core.entities.agent_roster_helpers import (
     agent_entry_for_id,
     count_user_chat,
@@ -24,6 +26,8 @@ from orchestrator_v4.core.entities.stage_evaluator import (
 )
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
+
+_LOG = logging.getLogger(__name__)
 
 
 class ConductInterviewTurn:
@@ -122,6 +126,16 @@ class ConductInterviewTurn:
 
         system_prompt = system_prompt_for_agent(ctx.agents, target_agent_id)
         agent_entry = agent_entry_for_id(ctx.agents, target_agent_id)
+        _LOG.info(
+            "conduct_interview_turn target_agent_id=%d agent_entry.model=%r "
+            "thinking_level=%r temperature=%r include_thoughts=%s system_prompt_len=%d",
+            target_agent_id,
+            agent_entry.model if agent_entry else None,
+            agent_entry.thinking_level if agent_entry else None,
+            agent_entry.temperature if agent_entry else None,
+            agent_entry.include_thoughts if agent_entry else None,
+            len(system_prompt or ""),
+        )
         reply = self._llm_gateway.get_response(
             user_input=text,
             agent_id=target_agent_id,

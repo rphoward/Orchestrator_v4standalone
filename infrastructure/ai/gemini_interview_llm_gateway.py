@@ -82,6 +82,13 @@ class GeminiInterviewLlmGateway:
 
         config = build_router_generate_config()
 
+        _LOG.info(
+            "route_intent call model=%s current_agent_id=%d agent_hint_ids=%s",
+            self._router_model,
+            current_agent_id,
+            sorted(agent_hints.keys()),
+        )
+
         try:
             response = self._client.models.generate_content(
                 model=self._router_model,
@@ -99,7 +106,20 @@ class GeminiInterviewLlmGateway:
                 reason="Routing failed (API error); defaulting to current agent",
             )
 
-        return self._parse_routing_response(response.text or "", current_agent_id)
+        raw_text = response.text or ""
+        _LOG.info(
+            "route_intent raw response.text[:200]=%r (total_len=%d)",
+            raw_text[:200],
+            len(raw_text),
+        )
+        decision = self._parse_routing_response(raw_text, current_agent_id)
+        _LOG.info(
+            "route_intent parsed target_agent_id=%d status=%s reason=%r",
+            decision.target_agent_id,
+            decision.workflow_status,
+            decision.reason,
+        )
+        return decision
 
     # ── Port: get_response ────────────────────────────────────────
 
@@ -157,14 +177,60 @@ class GeminiInterviewLlmGateway:
             include_thoughts=include_thoughts,
         )
 
+        effective_model = model.strip() or self._agent_model
+        _LOG.info(
+            "get_response call agent_id=%d model=%r thinking_level=%r include_thoughts=%s "
+            "temperature=%r history_len=%d cross_context_len=%d phase_len=%d",
+            agent_id,
+            effective_model,
+            thinking_level,
+            include_thoughts,
+            temperature,
+            len(history),
+            len(cross_context),
+            len(psychological_phase or ""),
+        )
+
         response = self._client.models.generate_content(
-            model=model.strip() or self._agent_model,
+            model=effective_model,
             contents=contents,
             config=config,
         )
 
-        text = response.text
+        candidates = list(response.candidates or [])
+        thought_parts = 0
+        text_parts = 0
+        final_text_chunks: list[str] = []
+        if candidates:
+            parts = list(getattr(candidates[0].content, "parts", None) or [])
+            for part in parts:
+                part_text = getattr(part, "text", None) or ""
+                if getattr(part, "thought", False):
+                    thought_parts += 1
+                elif part_text:
+                    text_parts += 1
+                    final_text_chunks.append(part_text)
+        combined_text = response.text
+        non_thought_final = "".join(final_text_chunks)
+        _LOG.info(
+            "get_response response candidates=%d thought_parts=%d text_parts=%d "
+            "response.text_len=%d non_thought_final_len=%d non_thought_head=%r",
+            len(candidates),
+            thought_parts,
+            text_parts,
+            len(combined_text or ""),
+            len(non_thought_final),
+            non_thought_final[:200],
+        )
+
+        text = combined_text
         if not text:
+            _LOG.warning(
+                "get_response empty response.text; thought_parts=%d text_parts=%d "
+                "(candidate may be only thoughts for include_thoughts=True)",
+                thought_parts,
+                text_parts,
+            )
             raise RuntimeError("Gemini returned an empty response")
         return text
 

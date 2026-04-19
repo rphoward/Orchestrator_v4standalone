@@ -2,6 +2,8 @@
 
 Session-agnostic snapshot for the next maintainer or a fresh AI context. If this doc fights the code, **trust the code** and fix the doc.
 
+**New conversation:** Cursor does not carry task memory across chats. For work-in-progress (for example the daily driver parchment plan), open the plan file or **`@`-mention it** in the first message so the agent loads the checklist and YAML status. This file is a map only; it does not auto-attach to new threads.
+
 ---
 
 ## 1. Purpose
@@ -43,7 +45,7 @@ This repo is **Orchestrator v4** as a **standalone** Flask app: interview sessio
 | [../.cursor/rules/](../.cursor/rules/) | Cursor project rules (`.mdc`) |
 | [../.cursor/plans/README.md](../.cursor/plans/README.md) | Where active Cursor plans live; skills note |
 | [BUTTON_UI_FEEDBACK_PLAN.md](../.cursor/plans/BUTTON_UI_FEEDBACK_PLAN.md) | Button press + optional UI sounds (static only); YAML tracks completion |
-| [DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) | Daily driver parchment + fonts + grain (not executed until YAML completed) |
+| [DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) | Daily driver parchment + fonts + grain — checklist + YAML track the same slices; **shipped** when both are fully completed |
 
 ---
 
@@ -83,7 +85,7 @@ All under `.cursor/rules/`. **`alwaysApply: true`** on architecture, conduct, sa
 
 ## 9. Recent landings (update when you ship)
 
-Use this as the **session bridge**: what changed recently on the static UI and tests. If it drifts, delete stale bullets.
+Use this as the **session bridge**: what changed recently on the static UI and tests. It does **not** replace opening [.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) in a new chat when that plan is active. If it drifts, delete stale bullets.
 
 **Button press + optional UI sounds (presentation static only)**
 
@@ -97,9 +99,17 @@ Use this as the **session bridge**: what changed recently on the static UI and t
 
 - From repo root: `uv pip install -e ".[dev]"` then `uv run pytest` (or `pytest` in the same env). Two smoke tests on core entities today — expand when you touch behavior.
 
-**Next UI (not executed in this handoff snapshot)**
+**Daily driver — parchment journal (presentation static)**
 
-- **Next aesthetic (planned, not assumed shipped):** [.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) — daily driver parchment, warm card, Fraunces + IBM Plex Sans, paper grain. Execute only after explicit go-ahead; confirm with `style.css` `:root` and `index.html` Tailwind `themeBg` / `themeSurface` if unsure whether it merged.
+- [.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) — **done** when plan YAML + checklist both show completed; Google Fonts preconnect + Fraunces / IBM Plex Sans, `--color-bg` / `--color-card` / `--color-border`, Tailwind `themeBg` / `themeSurface`, `.t-display` / `.t-display-italic`, `body::before` grain, `#nextQuestion` pull-quote sizing; `style.css?v=` bumped (e.g. 22) on ship.
+
+**Parchment followup — font chain + Gemini diagnostic logs**
+
+- [.cursor/plans/PARCHMENT_FOLLOWUP_LOGS_AND_HANDOFF_PLAN.md](../.cursor/plans/PARCHMENT_FOLLOWUP_LOGS_AND_HANDOFF_PLAN.md) — Tailwind `fontFamily.sans` extended to `"IBM Plex Sans"` (so `font-sans` actually paints body copy); `.section-label` 800 → 700; `style.css?v=23`. Added INFO logs in [infrastructure/ai/gemini_interview_llm_gateway.py](../infrastructure/ai/gemini_interview_llm_gateway.py) (`route_intent` + `get_response` parts breakdown) and [core/use_cases/conduct_interview_turn.py](../core/use_cases/conduct_interview_turn.py); [presentation/app.py](../presentation/app.py) uses `logging.basicConfig` so our lines show in dev.
+
+**Next session — read this first**
+
+- [docs/NEXT_SESSION_HANDOFF.md](NEXT_SESSION_HANDOFF.md) — one-page brief to diagnose the chat "echo" bug with the new logs (repro, decision tree, files to open).
 
 ---
 
