@@ -37,9 +37,14 @@ body {
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
 }
-.btn-primary:hover { filter: brightness(1.15); }
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 54, 38, 0.4);
+}
+.btn-primary:hover:not(:disabled) { filter: brightness(1.15); }
+.btn-primary:active:not(:disabled) { filter: brightness(0.96) saturate(0.86); }
 .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; filter: none; }
 
 .btn-secondary {
@@ -51,9 +56,18 @@ body {
     font-weight: 600;
     border: 1px solid var(--color-border);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
-.btn-secondary:hover { background: var(--color-bg); }
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 54, 38, 0.25);
+}
+.btn-secondary:hover:not(:disabled) { background: var(--color-bg); }
+.btn-secondary:active:not(:disabled) {
+    background: #ebe6e0;
+    border-color: #d4cbc0;
+}
+.btn-secondary:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-icon {
     width: 2.5rem;
@@ -67,9 +81,18 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    transition: all 0.15s;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s, box-shadow 0.15s;
 }
-.btn-icon:hover { background: var(--color-bg); }
+.btn-icon:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 54, 38, 0.25);
+}
+.btn-icon:hover:not(:disabled) { background: var(--color-bg); }
+.btn-icon:active:not(:disabled) {
+    background: #ebe6e0;
+    border-color: #d4cbc0;
+}
+.btn-icon:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .section-label {
     font-size: 0.7rem;
@@ -110,10 +133,22 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 0.875rem;
-    transition: all 0.15s;
+    transition: filter 0.15s, transform 0.1s, box-shadow 0.15s;
 }
-.send-button:hover { filter: brightness(1.2); }
+.send-button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 54, 38, 0.4);
+}
+.send-button:hover:not(:disabled) { filter: brightness(1.2); }
+.send-button:active:not(:disabled) { filter: brightness(0.96) saturate(0.86); }
 .send-button:disabled { opacity: 0.3; cursor: not-allowed; filter: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .btn-primary:active:not(:disabled),
+    .send-button:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+}
 
 .agent-tab {
     padding: 0.375rem 0.75rem;
@@ -124,10 +159,17 @@ body {
     background: var(--color-card);
     color: var(--color-text);
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+}
+.agent-tab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 54, 38, 0.25);
 }
 .agent-tab:hover { background: var(--color-teal-light); color: var(--color-teal); }
 .agent-tab.active { background: var(--color-teal); color: white; border-color: var(--color-teal); }
+.agent-tab:active:not(:disabled) {
+    filter: brightness(0.97);
+}
 
 .thread-tab {
     padding: 0.5rem 1rem;
@@ -377,6 +419,7 @@ ol.md-list { list-style-type: decimal; }
 /* ── Settings Modal — Two-Tab Layout ─────────────────────────────
    The settings modal is structured as:
      settings-header   (title + close)
+     settings-interface-strip (UI chrome, e.g. sounds toggle)
      settings-tab-bar  (tab buttons)
      settings-tab-panel (scrollable content area)
      settings-footer   (export/import/done)
@@ -395,6 +438,17 @@ ol.md-list { list-style-type: decimal; }
     justify-content: space-between;
     padding: 1.25rem 1.75rem 1rem;
     border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.settings-interface-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.5rem 1.75rem;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg);
     flex-shrink: 0;
 }
 
@@ -421,6 +475,7 @@ ol.md-list { list-style-type: decimal; }
 }
 .settings-tab:hover  { color: var(--color-text); }
 .settings-tab.active { color: var(--color-teal); border-bottom-color: var(--color-teal); }
+.settings-tab:active { opacity: 0.88; }
 
 .settings-tab-panel {
     flex: 1;

@@ -14,6 +14,11 @@ dependencies = [
     "python-dotenv>=1.2.1",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
 # Map import name `orchestrator_v4` to this directory (standalone tree layout).
 [tool.setuptools]
 package-dir = { "orchestrator_v4" = "." }
@@ -30,3 +35,11 @@ packages = [
 
 [tool.uv]
 managed = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-q"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]

@@ -22,7 +22,7 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="/static/style.css?v=19">
+    <link rel="stylesheet" href="/static/style.css?v=20">
 </head>
 <body class="bg-themeBg text-themeText min-h-screen flex font-sans">
 
@@ -272,6 +272,14 @@
                 <button onclick="closeSettings()" class="text-themeMuted hover:text-themeText text-xl leading-none">&times;</button>
             </div>
 
+            <div class="settings-interface-strip">
+                <span class="text-xs font-bold text-themeMuted uppercase tracking-wider">Interface</span>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="uiSoundsEnabled" name="uiSoundsEnabled" class="rounded border-themeBorder text-themeAccent focus:ring-themeAccent" />
+                    <label for="uiSoundsEnabled" class="text-sm text-themeText cursor-pointer">UI sounds</label>
+                </div>
+            </div>
+
             <!-- ── Tab Bar ── -->
             <div class="settings-tab-bar">
                 <button id="tabBtnAgents" class="settings-tab active" onclick="switchSettingsTab('agents')">
@@ -391,6 +399,6 @@
         </div>
     </div>
 
-    <script type="module" src="/static/app.js?v=19"></script>
+    <script type="module" src="/static/app.js?v=20"></script>
 </body>
 </html>

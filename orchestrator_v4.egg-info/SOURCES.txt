@@ -148,3 +148,4 @@ presentation/http_helpers.py
 presentation/interview_session_routes.py
 presentation/preflight_frozen.py
 presentation/prompt_template_routes.py
+tests/test_core_entities.py

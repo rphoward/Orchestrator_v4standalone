@@ -12,79 +12,79 @@ todos:
     content: >-
       style.css ONLY — Add :focus-visible keyboard ring/outline for .btn-primary,
       .btn-secondary, .btn-icon, .send-button. No :active or transform in this slice.
-    status: pending
+    status: completed
   - id: css-active-filter-primary-send
     content: >-
       style.css ONLY — For .btn-primary and .send-button: ensure :hover then :active
       order; :active uses desaturate+darken filter stack per §CSS details; :disabled
       must not show pressed (filter none / reset). No transform yet.
-    status: pending
+    status: completed
   - id: css-active-transform-primary-send-rrm
     content: >-
       style.css ONLY — Small translateY/scale on :active for .btn-primary and
       .send-button wrapped in @media (prefers-reduced-motion: no-preference). Disabled
       unchanged.
-    status: pending
+    status: completed
   - id: css-active-secondary-icon
     content: >-
       style.css ONLY — .btn-secondary and .btn-icon: :hover/:active/:disabled press
       treatment (subtler than teal; filter or background per §CSS details). No tab
       rules in this slice.
-    status: pending
+    status: completed
   - id: css-active-tabs-or-skip-doc
     content: >-
       style.css — Optional light :active on .settings-tab / .agent-tab OR skip with a
       one-line "Decision" bullet under §Decision log in this plan (no code if skipped).
-    status: pending
+    status: completed
   - id: html-settings-interface-strip
     content: >-
       index.html ONLY — Between settings-header and settings-tab-bar: compact row,
       native checkbox + visible label "UI sounds", stable id + label[for]. Theme
       classes only; no new JS in this slice.
-    status: pending
+    status: completed
   - id: js-module-shell-interview-ui-sounds
     content: >-
       presentation/static/modules/interview_ui_press_feedback.js (new) — Create file
       with 4+ line header per orchestrator-screaming-presentation.mdc (interview UI
       chrome, not feature panel). Export initUiFeedback() as no-op that does not throw.
       No localStorage, no AudioContext, no listeners yet.
-    status: pending
+    status: completed
   - id: js-checkbox-localstorage-only
     content: >-
       interview_ui_press_feedback.js ONLY — LOCAL_STORAGE_KEY constant; on
       initUiFeedback: bind checkbox by id from prior HTML todo; read storage default
       false; sync checked; on change persist boolean. No Web Audio, no document
       pointerdown yet.
-    status: pending
+    status: completed
   - id: js-web-audio-play-click-only
     content: >-
       interview_ui_press_feedback.js ONLY — playUiClick() + single reused
       AudioContext; resume on user gesture path; short low-volume envelope. No delegated
       listeners yet.
-    status: pending
+    status: completed
   - id: js-delegated-pointerdown-sounds
     content: >-
       interview_ui_press_feedback.js ONLY — When sounds enabled, one document-level
       pointerdown path: match .btn-primary/.btn-secondary/.btn-icon/.send-button and
       optional .settings-tab:not(.active); skip disabled/ancestor; pointerdown only;
       call resume + playUiClick. No changes to other modules.
-    status: pending
+    status: completed
   - id: app-import-interview-ui-sounds
     content: >-
       app.js ONLY — Add static import for ./modules/interview_ui_press_feedback.js
       alongside existing shell imports. Do not call init yet; do not reorder unrelated
       imports unless required for load order.
-    status: pending
+    status: completed
   - id: app-bootstrap-init-interview-ui-sounds
     content: >-
       app.js ONLY — In DOMContentLoaded handler, call initUiFeedback(). Update the
       header "Module tree" comment to list interview_ui_press_feedback.js.
-    status: pending
+    status: completed
   - id: verify-manual-and-cache-bust
     content: >-
       Manual QA per "Manual verification checklist" below; bump index.html
       /static/app.js?v= if index or app.js changed.
-    status: pending
+    status: completed
 ---
 
 # Button UI feedback and optional sounds
@@ -111,7 +111,7 @@ agent-specific).
 
 ## Decision log
 
-- _(Append a bullet when css-active-tabs-or-skip-doc skips or ships tab :active.)_
+- **Tab press:** Shipped light `:active` on `.settings-tab` (opacity) and `.agent-tab` (brightness filter); no skip.
 
 ## Locked design decisions
 
