@@ -76,6 +76,13 @@ def main() -> None:
             "IT can place a .env file next to this executable with GEMINI_API_KEY=… "
             "(company key), or set the variable system-wide."
         )
+    elif not bootstrap.gemini_api_key_configured:
+        print(
+            "\n⚠️  GEMINI_API_KEY is not set — interview turns use the offline stub "
+            "(routing reason looks like stub-route; replies echo your text). "
+            "Add GEMINI_API_KEY to .env in the project folder or paste a key in Settings, "
+            "then restart this server.\n"
+        )
     host = os.environ.get("ORCHESTRATOR_HOST", "127.0.0.1")
     print(f"\n🎙️  Orchestrator V4 -> http://{host}:{port}\n")
     app.run(host=host, port=port, debug=debug)

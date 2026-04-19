@@ -670,6 +670,26 @@ export async function refreshHeaderState() {
     } catch(e) {}
 }
 
+/**
+ * Align manual agent tabs + active thread with `session.current_agent_id`.
+ * Auto-route uses that field as the router anchor; call when turning Auto-Route on so the
+ * UI matches what the next `/send` will use (not the last manual tab click).
+ */
+export async function syncActiveThreadToSessionCurrentAgent() {
+    if (!currentSessionId) return;
+    try {
+        const sessions = await api(_sessionsListUrl());
+        const session = sessions.find((s) => s.id === currentSessionId);
+        const aid = session?.current_agent_id;
+        if (aid == null || aid < 1) return;
+        const { selectAgent, showThread } = await import('./chat.js');
+        selectAgent(aid);
+        await showThread(aid);
+    } catch (e) {
+        console.warn('syncActiveThreadToSessionCurrentAgent failed:', e);
+    }
+}
+
 export async function loadAgents() {
     try {
         const data = await api('/api/agents');

@@ -13,6 +13,19 @@ from orchestrator_v4.infrastructure.ai.gemini_policy_constants import (
 
 _LOG = logging.getLogger(__name__)
 
+_ROUTER_RESPONSE_SCHEMA = types.Schema(
+    type=types.Type.OBJECT,
+    properties={
+        "agent_id": types.Schema(type=types.Type.INTEGER),
+        "workflow_status": types.Schema(
+            type=types.Type.STRING,
+            enum=["STAY", "DRIFT", "ADVANCE"],
+        ),
+        "reason": types.Schema(type=types.Type.STRING),
+    },
+    required=["agent_id", "workflow_status", "reason"],
+)
+
 
 def resolve_thinking_level_enum(raw: str) -> types.ThinkingLevel | None:
     level = raw.strip().upper()
@@ -50,6 +63,7 @@ def parse_temperature_for_config(raw: str) -> float | None:
 def build_router_generate_config() -> types.GenerateContentConfig:
     return types.GenerateContentConfig(
         response_mime_type="application/json",
+        response_schema=_ROUTER_RESPONSE_SCHEMA,
         temperature=ROUTER_GENERATE_TEMPERATURE,
         thinking_config=types.ThinkingConfig(
             thinking_level=types.ThinkingLevel.MINIMAL,

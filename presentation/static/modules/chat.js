@@ -18,6 +18,7 @@ import {
     updateStageBadge,
     refreshHeaderState,
     refreshSessionTranscriptCache,
+    syncActiveThreadToSessionCurrentAgent,
 } from './sessions.js';
 
 /**
@@ -34,10 +35,10 @@ export function toggleAutoRoute() {
     setAutoRoute(document.getElementById('autoRouteToggle').checked);
     const selector = document.getElementById('manualSelector');
     if (autoRoute) {
-        // Just make it a visual indicator instead of completely hiding it
-        selector.classList.remove('hidden');
-        selector.style.pointerEvents = 'none';
-        selector.style.opacity = '0.7';
+        selector.classList.add('hidden');
+        selector.style.pointerEvents = '';
+        selector.style.opacity = '';
+        void syncActiveThreadToSessionCurrentAgent();
     } else {
         selector.classList.remove('hidden');
         selector.style.pointerEvents = 'auto';

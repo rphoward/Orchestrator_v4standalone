@@ -223,7 +223,23 @@ class GeminiInterviewLlmGateway:
             non_thought_final[:200],
         )
 
-        text = combined_text
+        # Prefer explicit non-thought ``Part`` text when present. ``response.text`` can still
+        # concatenate spans oddly on some Gemini builds (echo / blurred turns — any agent).
+        if non_thought_final.strip():
+            text = non_thought_final
+        elif include_thoughts and thought_parts > 0 and text_parts == 0:
+            _LOG.warning(
+                "get_response only thinking parts with include_thoughts=True "
+                "(no non-thought assistant text); thought_parts=%d response.text_head=%r",
+                thought_parts,
+                (combined_text or "")[:120],
+            )
+            raise RuntimeError(
+                "Gemini returned only thinking content with no assistant text"
+            )
+        else:
+            text = combined_text or ""
+
         if not text:
             _LOG.warning(
                 "get_response empty response.text; thought_parts=%d text_parts=%d "

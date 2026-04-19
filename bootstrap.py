@@ -196,8 +196,16 @@ def rebind_llm_gateway() -> None:
             router_model=rid,
             agent_model=afid,
         )
+        _LOG.info("LLM gateway: live Gemini API (router=%s)", rid)
     else:
         _llm_gateway = FakeInterviewLlmGateway()
+        _LOG.warning(
+            "LLM gateway: offline stub — no GEMINI_API_KEY at startup. "
+            "Routing logs show reason %r; replies prefix your message with %r (no API calls). "
+            "Put GEMINI_API_KEY in .env next to bootstrap.py or save a key under Settings.",
+            "stub-route",
+            "echo:",
+        )
 
     conduct_interview_turn = ConductInterviewTurn(_turn_store, _llm_gateway)
     initialize_session = InitializeInterviewSession(_turn_store, _llm_gateway)
