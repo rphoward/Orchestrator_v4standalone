@@ -1,5 +1,7 @@
 /**
- * utils.js — Pure helpers. No DOM, no state, no side effects.
+ * Cross-cutting interview UI shell — not a feature module.
+ * Owns: pure helpers (escapeHtml, temperature clamp, error hints) — no DOM, no app state.
+ * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
  */
 
 export const AGENT_ICONS = { 1: '🪞', 2: '🛑', 3: '🎯', 4: '⚙️', 5: '🛡️' };

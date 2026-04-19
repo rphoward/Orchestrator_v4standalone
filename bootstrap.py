@@ -1,8 +1,7 @@
 """
-Composition root for Orchestrator4 `orchestrator_v4/` tree.
+Composition root: wires infrastructure adapters into core use cases.
 
-Wires infrastructure adapters into core use cases. This module may import all layers;
-domain code must not import from here.
+May import all layers. Domain code in ``core/`` must not import this module.
 """
 
 from __future__ import annotations

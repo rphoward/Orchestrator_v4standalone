@@ -1,0 +1,40 @@
+---
+description: Plain-language style for human-facing docs and checklists.
+globs:
+  - README.md
+  - DEV-STANDALONE.md
+  - .cursor/plans/**
+  - .cursor/rules/orchestrator-screaming-presentation.mdc
+---
+
+# Documentation style (human-facing)
+
+When editing or creating documents meant to be read by humans (not machines or only other tools), prefer **plain, concrete language** over internal jargon.
+
+## Audience
+
+- **Human-facing**: planning packets, UX docs, manual test checklists, README sections aimed at users or teammates.
+- **Tool-facing**: JSON/YAML manifests, machine-only configs are **not** governed by this rule.
+
+## Style rules
+
+- **Describe actions as steps**: say **“What to do”** and **“What you should see”** instead of only naming functions or states.
+- **Avoid unexplained jargon**: if you must use a term like “loader”, “toast”, or “workspace”, either:
+  - Replace it with plainer wording (e.g. “short loading message”, “error bar at the bottom”), or
+  - Explain it the first time in that document.
+- **Prefer UI words over code words**:
+  - Say “welcome screen”, “main interview screen”, “session list in the left sidebar” instead of `#welcomeSection`, `#mainContent`, `#sessionList`.
+  - Reserve ids / class names / function names for the **Primary files** / developer notes part of a doc.
+- **Concrete examples beat abstractions**:
+  - Use realistic values (e.g. “type `Acme Corp` as the client name”, “set temperature to `3` and expect it to clamp to `2`”) instead of abstract descriptions.
+
+## Checklists and acceptance criteria
+
+- Manual test rows should read naturally to a person running them in the browser:
+  - One column that says **what to do**.
+  - One column that says **what should happen** on screen.
+- Only include internal names (ids, function names, file paths) in a dedicated “Primary files” / “For developers” column or section.
+
+## When in doubt
+
+- If a sentence would confuse a non-implementer (e.g. a PM or UX researcher), rewrite it in plainer language while keeping a **separate** hook back to the code for developers.

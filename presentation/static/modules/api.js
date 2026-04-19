@@ -1,6 +1,7 @@
 /**
- * api.js — HTTP layer.
- * Provides the api() helper and the loadModels() bootstrapper.
+ * Cross-cutting interview UI shell — not a feature module.
+ * Owns: typed `fetch` wrapper (`api`) and `loadModels()` bootstrap for the registry.
+ * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
  */
 
 import { showError }       from './ui.js';

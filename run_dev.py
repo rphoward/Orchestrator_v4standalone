@@ -33,6 +33,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 
@@ -42,8 +43,28 @@ def _package_root() -> Path:
 
 
 def _import_root() -> Path:
-    """Directory that contains the ``orchestrator_v4`` package directory."""
-    return _package_root().parent
+    """Directory used as ``cwd`` for ``python -m orchestrator_v4.…``.
+
+    **Nested monorepo layout:** ``…/repo/orchestrator_v4/run_dev.py`` — import root is the
+    parent of ``orchestrator_v4/`` so ``orchestrator_v4`` resolves as a package directory.
+
+    **Flat standalone layout:** ``package-dir = { \"orchestrator_v4\" = \".\" }`` in
+    ``pyproject.toml`` — the package root *is* this directory; ``cwd`` must be here, not
+    the parent, or ``-m orchestrator_v4.*`` will not resolve.
+    """
+    pkg = _package_root()
+    pyproject = pkg / "pyproject.toml"
+    if pyproject.is_file():
+        try:
+            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+        except OSError:
+            data = {}
+        except tomllib.TOMLDecodeError:
+            data = {}
+        pkg_dir = (data.get("tool") or {}).get("setuptools", {}).get("package-dir")
+        if isinstance(pkg_dir, dict) and pkg_dir.get("orchestrator_v4") == ".":
+            return pkg
+    return pkg.parent
 
 
 def _load_dotenv_simple(path: Path) -> None:
@@ -109,9 +130,29 @@ def _ensure_venv(package_root: Path) -> Path:
     return vpy
 
 
+def _ensure_editable_for_flat_layout(package_root: Path, python_exe: Path) -> None:
+    """Flat ``package-dir`` trees need an editable install for ``python -m orchestrator_v4.*``."""
+    if _import_root() != package_root:
+        return
+    uv = shutil.which("uv")
+    if uv:
+        subprocess.run(
+            [uv, "pip", "install", "-q", "-e", "."],
+            cwd=package_root,
+            check=True,
+        )
+        return
+    subprocess.run(
+        [str(python_exe), "-m", "pip", "install", "-q", "-e", "."],
+        cwd=package_root,
+        check=True,
+    )
+
+
 def main() -> None:
     pkg = _package_root()
     python_exe = _ensure_venv(pkg)
+    _ensure_editable_for_flat_layout(pkg, python_exe)
     _load_dotenv_simple(pkg / ".env")
 
     parser = argparse.ArgumentParser(

@@ -1,0 +1,30 @@
+---
+description: core/ — no I/O; no imports from infrastructure or presentation.
+globs:
+  - core/**
+---
+
+# `core/`
+
+**No I/O:** no Flask, no DB drivers, no HTTP clients, no env reads as part of domain logic.
+
+## Imports
+
+**Forbidden:** `orchestrator_v4.infrastructure`, `orchestrator_v4.presentation` (the folders `infrastructure/` and `presentation/` on disk).
+
+## Need something from outside?
+
+1. Add or use an interface in `core/ports/`.
+2. Implement it under `infrastructure/`.
+3. Pass the instance into the use case (argument or constructor)—not a global.
+
+## Subfolders
+
+- **`entities/`**: shapes and rules on those shapes.
+- **`use_cases/`**: one user-visible action per module; calls entities and ports only.
+- **`ports/`**: interfaces only.
+
+## Naming
+
+- Prefer interview-domain words (session, turn, roster).
+- Avoid empty job-title names: `Service`, `Manager`, `Handler`, `Helper`, `Model`, `Item`.

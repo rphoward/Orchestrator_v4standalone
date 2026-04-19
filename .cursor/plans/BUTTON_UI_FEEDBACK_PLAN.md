@@ -8,57 +8,82 @@ overview: >-
   touchpoints live here; coding agents execute the YAML todos in order and flip
   statuses to completed as they land each slice.
 todos:
-  - id: css-pressed-motion
+  - id: css-focus-visible-btn-send
     content: >-
-      style.css — Add :active + hover ordering for .btn-primary, .btn-secondary,
-      .btn-icon, and .send-button. Pressed = middle-road desaturation + tiny darken
-      via stacked filters (target ~saturate(0.84–0.88) and ~brightness(0.95–0.97)
-      on primary/send; tune so label contrast stays acceptable). Add transform
-      translateY(1px) or scale(0.98) only inside @media (prefers-reduced-motion: no-preference).
-      Ensure :disabled keeps filter:none (or explicit reset) so pressed styles never
-      apply to disabled. Add :focus-visible outline/ring where missing for keyboard.
+      style.css ONLY — Add :focus-visible keyboard ring/outline for .btn-primary,
+      .btn-secondary, .btn-icon, .send-button. No :active or transform in this slice.
     status: pending
-  - id: css-secondary-icon-tabs
+  - id: css-active-filter-primary-send
     content: >-
-      style.css — Mirror :active treatment for .btn-secondary and .btn-icon (subtler
-      movement acceptable). Optionally add light :active to .settings-tab and .agent-tab
-      for parity; skip if it fights .active tab styling — document decision in PR.
+      style.css ONLY — For .btn-primary and .send-button: ensure :hover then :active
+      order; :active uses desaturate+darken filter stack per §CSS details; :disabled
+      must not show pressed (filter none / reset). No transform yet.
     status: pending
-  - id: html-interface-strip
+  - id: css-active-transform-primary-send-rrm
     content: >-
-      index.html — Between settings-header and settings-tab-bar, insert a compact
-      "Interface" row (label + checkbox or switch). Use native checkbox with visible
-      label "UI sounds" and id; associate label with for=. Do not put this inside a
-      single tab panel. Match existing Tailwind/theme classes used on the modal
-      (text-themeMuted, flex, gap, border-b if needed).
+      style.css ONLY — Small translateY/scale on :active for .btn-primary and
+      .send-button wrapped in @media (prefers-reduced-motion: no-preference). Disabled
+      unchanged.
     status: pending
-  - id: module-ui-feedback
+  - id: css-active-secondary-icon
     content: >-
-      modules/ui_feedback.js (new) — Export initUiFeedback(). Constants: LOCAL_STORAGE_KEY
-      = 'orchestrator_v4_ui_sounds_enabled' (or project-consistent prefix), default false.
-      On init: read storage, set checkbox checked, on change persist boolean. Implement
-      playUiClick() using Web Audio API (short oscillator or noise burst, very low
-      volume, ~40–80ms envelope); no external audio files. If sounds enabled, register
-      capture or bubble pointerdown on document (or main) that matches button selectors:
-      .btn-primary, .btn-secondary, .btn-icon, .send-button, and optionally .settings-tab
-      not .active — skip when event.target.closest('button, [role=button]') is disabled
-      or has disabled ancestor. Call audioCtx.resume() inside the handler after user
-      gesture. Guard double-fire (pointerdown only, not click). No sound for plain links
-      unless they use button classes.
+      style.css ONLY — .btn-secondary and .btn-icon: :hover/:active/:disabled press
+      treatment (subtler than teal; filter or background per §CSS details). No tab
+      rules in this slice.
     status: pending
-  - id: wire-app-entry
+  - id: css-active-tabs-or-skip-doc
     content: >-
-      app.js — import './modules/ui_feedback.js' and call initUiFeedback() from
-      DOMContentLoaded after DOM exists (same listener block as loadModels is fine, or
-      end of listener). Update app.js header comment module tree to list ui_feedback.js.
+      style.css — Optional light :active on .settings-tab / .agent-tab OR skip with a
+      one-line "Decision" bullet under §Decision log in this plan (no code if skipped).
     status: pending
-  - id: verify-manual
+  - id: html-settings-interface-strip
     content: >-
-      Manual QA — With sounds off: press/hover/disabled on Agent Config Apply and a
-      registry save. With sounds on: hear click on primary buttons; toggle off mid-session.
-      OS "reduce motion" on: confirm no transform, color press still visible. Bump
-      index.html script cache ?v= if the project does that for static busting when
-      index changes.
+      index.html ONLY — Between settings-header and settings-tab-bar: compact row,
+      native checkbox + visible label "UI sounds", stable id + label[for]. Theme
+      classes only; no new JS in this slice.
+    status: pending
+  - id: js-module-shell-interview-ui-sounds
+    content: >-
+      presentation/static/modules/interview_ui_press_feedback.js (new) — Create file
+      with 4+ line header per orchestrator-screaming-presentation.mdc (interview UI
+      chrome, not feature panel). Export initUiFeedback() as no-op that does not throw.
+      No localStorage, no AudioContext, no listeners yet.
+    status: pending
+  - id: js-checkbox-localstorage-only
+    content: >-
+      interview_ui_press_feedback.js ONLY — LOCAL_STORAGE_KEY constant; on
+      initUiFeedback: bind checkbox by id from prior HTML todo; read storage default
+      false; sync checked; on change persist boolean. No Web Audio, no document
+      pointerdown yet.
+    status: pending
+  - id: js-web-audio-play-click-only
+    content: >-
+      interview_ui_press_feedback.js ONLY — playUiClick() + single reused
+      AudioContext; resume on user gesture path; short low-volume envelope. No delegated
+      listeners yet.
+    status: pending
+  - id: js-delegated-pointerdown-sounds
+    content: >-
+      interview_ui_press_feedback.js ONLY — When sounds enabled, one document-level
+      pointerdown path: match .btn-primary/.btn-secondary/.btn-icon/.send-button and
+      optional .settings-tab:not(.active); skip disabled/ancestor; pointerdown only;
+      call resume + playUiClick. No changes to other modules.
+    status: pending
+  - id: app-import-interview-ui-sounds
+    content: >-
+      app.js ONLY — Add static import for ./modules/interview_ui_press_feedback.js
+      alongside existing shell imports. Do not call init yet; do not reorder unrelated
+      imports unless required for load order.
+    status: pending
+  - id: app-bootstrap-init-interview-ui-sounds
+    content: >-
+      app.js ONLY — In DOMContentLoaded handler, call initUiFeedback(). Update the
+      header "Module tree" comment to list interview_ui_press_feedback.js.
+    status: pending
+  - id: verify-manual-and-cache-bust
+    content: >-
+      Manual QA per "Manual verification checklist" below; bump index.html
+      /static/app.js?v= if index or app.js changed.
     status: pending
 ---
 
@@ -77,6 +102,17 @@ agent-specific).
 - No long audio assets, no autoplay before gesture.
 - No change to core/use cases; `presentation/` static only.
 
+## Atomic slice rules (for agents)
+
+- **One YAML todo = one slice:** touch the listed primary file(s) only; do not rename `sessions.js` / `settings.js` / etc. in the same commit as this work.
+- **Order is load-bearing:** HTML checkbox ids before JS binding; CSS focus before stacked `:active` if that avoids fighting specificity; import-only `app.js` todo before `init` todo so bisect stays clean.
+- **Screaming rename:** New sound module uses **`interview_ui_press_feedback.js`** (not `ui_feedback.js`) so the filename matches interview UI chrome policy; older drafts used `ui_feedback` — ignore that name unless you explicitly revert in a dedicated rename todo.
+- **Standalone paths:** Repo root paths are `presentation/static/...` (there is no `orchestrator_v4/` folder on disk).
+
+## Decision log
+
+- _(Append a bullet when css-active-tabs-or-skip-doc skips or ships tab :active.)_
+
 ## Locked design decisions
 
 | Topic | Decision |
@@ -91,10 +127,10 @@ agent-specific).
 
 | File | Role |
 |------|------|
-| `orchestrator_v4/presentation/static/style.css` | `:active`, `:focus-visible`, reduced-motion for `.btn-*`, `.send-button`, optional tabs. |
-| `orchestrator_v4/presentation/static/index.html` | Interface strip markup inside `#settingsModal`. |
-| `orchestrator_v4/presentation/static/modules/ui_feedback.js` | **New** — storage, toggle wiring, delegated sound. |
-| `orchestrator_v4/presentation/static/app.js` | Import + `initUiFeedback()`. |
+| [presentation/static/style.css](../../presentation/static/style.css) | `:active`, `:focus-visible`, reduced-motion for `.btn-*`, `.send-button`, optional tabs. |
+| [presentation/static/index.html](../../presentation/static/index.html) | Interface strip markup inside `#settingsModal`. |
+| [presentation/static/modules/interview_ui_press_feedback.js](../../presentation/static/modules/interview_ui_press_feedback.js) | **New** — localStorage, toggle, Web Audio click, delegated `pointerdown`. |
+| [presentation/static/app.js](../../presentation/static/app.js) | Import + `initUiFeedback()`. |
 
 ## CSS details (for implementers)
 
@@ -113,6 +149,17 @@ agent-specific).
 - **Toggle UI** must run even if user never opens Agents tab — init on app load, not
   only when `openSettings()` runs (checkbox exists in DOM at parse time).
 - **Security / noise**: keep listener logic minimal; no eval; no new dependencies.
+- **localStorage key (locked):** `orchestrator_v4_ui_sounds_enabled` — boolean; default
+  when missing is off (`false`).
+
+## Manual verification checklist
+
+- Sounds **off** (default): press and hover **Agent Config → Apply** and a registry
+  save control; confirm **disabled** controls never show pressed styling or play sound.
+- Sounds **on**: `pointerdown` on primary (and other matched) controls produces a
+  short click; toggle **off** mid-session and confirm silence immediately.
+- OS **reduce motion** on: no translate/scale on `:active`; color/filter press still
+  visible on primary/send where designed.
 
 ## Tests
 
@@ -127,6 +174,7 @@ file as each todo merges; do not leave stale `pending` after the work ships.
 
 ## Relocation note
 
-If this file was copied to the monorepo root for recovery, move it to
-`orchestrator_v4/.cursor/plans/button_ui_feedback_and_sounds.plan.md` on your working
-tree so it sits with other v4 plans.
+If this file was copied to the monorepo root for recovery, move it under the package’s
+`.cursor/plans/` on your working tree so it sits with other v4 plans. Path prefix in
+monorepos may be `orchestrator_v4/`; this standalone clone uses repo-root
+`presentation/static/`.

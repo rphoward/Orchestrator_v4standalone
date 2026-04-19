@@ -1,7 +1,8 @@
 /**
- * state.js — Shared mutable application state.
- * All other modules import from here; mutations go through setters
- * so call sites are easy to grep.
+ * Cross-cutting interview UI shell — not a feature module.
+ * Owns: shared mutable browser state (sessions list, agents, model registry pointers).
+ * Mutations go through setters so call sites are easy to grep.
+ * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
  */
 
 export let autoRoute       = true;

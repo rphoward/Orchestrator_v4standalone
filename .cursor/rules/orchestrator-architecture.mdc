@@ -1,0 +1,43 @@
+---
+description: Canonical layer map, import direction, vertical vs horizontal slices. Commands live in AGENTS.md; runbooks in DEV-STANDALONE.md.
+alwaysApply: true
+---
+
+# Orchestrator v4 — architecture (standalone repo)
+
+## Horizontal vs vertical (read this first)
+
+- **Horizontal slices** = **layers** at repo root: `core/`, `infrastructure/`, `presentation/`, plus `bootstrap.py`. The dependency rule is fixed: **outer layers may depend on `core/`; `core/` never depends on outer layers.** Same rule after any feature work: a vertical slice must not blur these boundaries.
+- **Vertical slices** = **one user-facing capability** implemented **through** the stack (e.g. new use case + port + adapter + route). Vertical work should **tighten** horizontal separation (smaller handlers, clearer ports)—not bypass it with shortcuts (routes calling DB, entities doing HTTP, etc.).
+
+## Naming (screaming)
+
+- **Same idea as use cases:** pick words a maintainer would say out loud about this product—**interview**, **session**, **turn**, **agent roster**, **prompt**, **model registry**—not `Service`, `Helper`, `utils2`.
+- **`presentation/` detail:** routes and static JS should follow that vocabulary too. Checklist and rename hints: **`.cursor/rules/orchestrator-screaming-presentation.mdc`** (loads when you work under `presentation/`).
+
+## Where code lives
+
+- Application code sits at the **repository root**: `core/`, `infrastructure/`, `presentation/`, `bootstrap.py`. The Python package name is `orchestrator_v4` (`pyproject.toml` `package-dir`). Do not add a second app tree under a nested `orchestrator_v4/` folder.
+
+## Import direction (one rule)
+
+- **`infrastructure/`** and **`presentation/`** may import **`orchestrator_v4.core`** (entities, use cases, ports).
+- **`core/`** must **not** import `infrastructure` or `presentation`, and must **not** do I/O (disk, network, DB drivers, HTTP clients, reading env as part of domain logic).
+
+## What each folder is for
+
+- **`core/entities/`**: types and invariants; no I/O.
+- **`core/use_cases/`**: one runnable step per feature; calls entities and **port interfaces only**; no I/O.
+- **`core/ports/`**: interfaces only—no SDK or DB code.
+- **`infrastructure/`**: adapters (SQLite, Gemini, files) that **implement** `core/ports/`.
+- **`presentation/`**: HTTP and static UI—parse input, call use cases, return responses. No heavy product rules in route handlers.
+- **`bootstrap.py`**: **only** composition root—wires real adapters into use cases. May import all layers; nothing in `core/` imports `bootstrap` for domain logic.
+
+## Avoid
+
+- One giant I/O file for everything; huge use cases—split or move logic to entities.
+- Vague names: `Service`, `Manager`, `Helper`, `Controller` when the name could mean anything.
+
+## New external capability (API, DB, disk)
+
+Add a **port** in `core/ports/`, an **adapter** in `infrastructure/`, pass the adapter into the use case from `bootstrap.py`. No hidden globals.

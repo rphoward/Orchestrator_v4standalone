@@ -1,0 +1,26 @@
+---
+description: infrastructure/ — I/O and SDKs; implements core/ports only.
+globs:
+  - infrastructure/**
+---
+
+# `infrastructure/`
+
+**I/O allowed:** SQLite, Gemini, disk, network, third-party SDKs.
+
+## Imports
+
+**Allowed:** `orchestrator_v4.core.ports`, `orchestrator_v4.core.entities`, drivers and stdlib.
+
+**Forbidden:** `orchestrator_v4.presentation`.
+
+**Avoid:** importing `orchestrator_v4.core.use_cases`—adapters implement **ports**, not use-case modules.
+
+## Adapters
+
+- One adapter (or a small related set) per port contract.
+- Keep storage and HTTP details out of `core/`.
+
+## Naming
+
+- Name both tech and role, e.g. `SqliteInterviewSessionTurnStore`—not bare `Gateway` / `Repository`.

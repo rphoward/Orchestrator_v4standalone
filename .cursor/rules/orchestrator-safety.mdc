@@ -1,0 +1,12 @@
+---
+description: Hard limits — destructive commands, scope, secrets, task focus, when to pause for a plan.
+alwaysApply: true
+---
+
+# Safety and boundaries
+
+- **Destructive commands:** Do not delete or wipe directories in bulk (`rm -rf`, `Remove-Item -Recurse -Force`, mass `del`) unless the user clearly agreed after a plain-language warning.
+- **Scope:** Stay inside this workspace root. Do not read or change parent folders unless the user asked.
+- **Secrets:** Never hardcode API keys or tokens. Do not paste secrets into chat. Use `.env` or other documented stores.
+- **Task focus:** No drive-by refactors or unrelated files unless the user asked.
+- **Risky changes:** If a change is large, unfamiliar, or touches deploy or secrets, give a **short plan** or ask **one** clarifying question before editing.

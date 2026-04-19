@@ -1,0 +1,13 @@
+---
+description: Light workflow — plan multi-step work, use editor tools over blind shell, short summaries.
+alwaysApply: true
+---
+
+# Workspace conduct
+
+- **Multi-step work:** Sketch steps before large edits or many commands.
+- **Tools:** Prefer search / read-file / repo navigation over guessing paths in the shell.
+- **After changes:** One short note of what you changed or ran.
+- **Words:** Use vocabulary already in this repo (session, turn, agent roster, interview). See `AGENTS.md` section 1 for tone.
+- **Docs:** Update `.cursor/plans/` or `DEV-STANDALONE.md` when you intentionally change behavior they describe—skip cosmetic-only doc churn.
+- **Rule text:** Write project rules and plans in **informal American English**—short bullets, normal word order, no stiff translated tone.
