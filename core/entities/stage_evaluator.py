@@ -1,4 +1,15 @@
-"""Pure stage gating and completion heuristics (ported from v3 StageEvaluator)."""
+"""Pure stage gating and completion heuristics (ported from v3 StageEvaluator).
+
+`session.current_agent_id` means the **active stage pointer**: the earliest
+unfinished stage in 1..4, recomputed from the four `stageN_complete` flags
+after every turn (auto or manual). When all four flags are true the pointer
+stays at 4; agent 5 (Grand Synthesis) is the manual-only synthesizer and is
+never the pointer.
+
+Auto-routing may target any agent from 1 up to the pointer (so the router can
+drift back to a finished stage when the consultant won't let go), but never
+past the pointer. Manual routing can target any agent 1..5.
+"""
 
 from __future__ import annotations
 
@@ -7,44 +18,46 @@ from collections.abc import Mapping, Sequence
 from orchestrator_v4.core.entities.interview_turn import RoutingDecision, TurnConversationLine
 
 
-def can_advance(
-    current_agent_id: int,
-    stage_flags: Mapping[int, bool],
-    target_stage_id: int,
-) -> bool:
+def earliest_unfinished_stage(stage_flags: Mapping[int, bool]) -> int:
     """
-    Whether routing may move forward to target_stage_id.
-    Same rules as v3: can always stay or go back; forward moves need prior stage complete.
+    Earliest stage id in 1..4 whose completion flag is falsy.
+
+    When all four are truthy, returns 4 (the pointer does not cross into the
+    synthesizer; agent 5 is manual-only).
     """
-    if target_stage_id <= current_agent_id:
-        return True
-
-    if target_stage_id == 2 and stage_flags.get(1, False):
-        return True
-    if target_stage_id == 3 and stage_flags.get(2, False):
-        return True
-    if target_stage_id == 4 and stage_flags.get(3, False):
-        return True
-
-    return False
+    for stage_id in (1, 2, 3, 4):
+        if not stage_flags.get(stage_id, False):
+            return stage_id
+    return 4
 
 
-def apply_routing_veto(
+def apply_sequential_stage_veto(
     routing_decision: RoutingDecision,
-    current_agent_id: int,
     stage_flags: Mapping[int, bool],
 ) -> RoutingDecision:
-    """If router says ADVANCE but domain disallows, force STAY on current agent."""
-    if routing_decision.workflow_status != "ADVANCE":
-        return routing_decision
+    """
+    Clamp an auto-routing decision so it can never jump past the active stage pointer.
 
-    if can_advance(current_agent_id, stage_flags, routing_decision.target_agent_id):
+    Allowed: any target from 1 up to and including the pointer (back-drift to a
+    finished stage is fine; the router may want to follow the consultant there).
+
+    Forbidden: any target higher than the pointer. The decision is rewritten to
+    `STAY` on the pointer with a reason that preserves the router's original
+    intent for audit in `routing_logs`.
+    """
+    pointer = earliest_unfinished_stage(stage_flags)
+    target = routing_decision.target_agent_id
+    if target <= pointer:
         return routing_decision
 
     return RoutingDecision(
-        target_agent_id=current_agent_id,
+        target_agent_id=pointer,
         workflow_status="STAY",
-        reason=routing_decision.reason,
+        reason=(
+            f"Sequential stage veto: router wanted agent {target} "
+            f"(status={routing_decision.workflow_status}), "
+            f"forced to stage {pointer} (next unfinished)"
+        ),
     )
 
 

@@ -21,7 +21,8 @@ from orchestrator_v4.core.entities.pierce_holt_engine import (
     psychological_phase_value,
 )
 from orchestrator_v4.core.entities.stage_evaluator import (
-    apply_routing_veto,
+    apply_sequential_stage_veto,
+    earliest_unfinished_stage,
     evaluate_stage_completion,
 )
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
@@ -46,9 +47,10 @@ class ConductInterviewTurn:
 
         ctx = self._turn_store.load_turn_context(session_id)
 
-        agent_hints = {a.id: a.router_hint for a in ctx.agents}
+        # Agent 5 (Grand Synthesis) is manual-only; never hint it to the auto-router.
+        agent_hints = {a.id: a.router_hint for a in ctx.agents if not a.is_synthesizer}
         raw = self._llm_gateway.route_intent(text, ctx.current_agent_id, agent_hints)
-        decision = apply_routing_veto(raw, ctx.current_agent_id, ctx.stage_flags())
+        decision = apply_sequential_stage_veto(raw, ctx.stage_flags())
 
         target_agent_id = decision.target_agent_id
         agent_name = roster_agent_name(ctx.agents, target_agent_id)
@@ -178,9 +180,10 @@ class ConductInterviewTurn:
             ctx.stage_flags(),
         )
 
-        # Current agent must match who handled this turn (messages + reply are on target_agent_id).
-        # workflow_status is semantic only; STAY can still route to another agent (e.g. backward hop).
-        next_current = target_agent_id
+        # session.current_agent_id holds the active stage pointer (earliest
+        # unfinished stage 1..4); recompute it from the new stage flags every
+        # turn. Who handled THIS turn is still `target_agent_id` in the result.
+        next_current = earliest_unfinished_stage(new_flags)
 
         session_renamed: str | None = None
         new_name = ctx.name
@@ -203,4 +206,5 @@ class ConductInterviewTurn:
             response=reply,
             psychological_phase=phase,
             session_renamed=session_renamed,
+            active_stage_pointer=next_current,
         )

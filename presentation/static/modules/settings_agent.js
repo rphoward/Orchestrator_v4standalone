@@ -12,7 +12,7 @@ import {
     SETTINGS_TEMP_MAX,
 } from './utils.js';
 import { modelRegistry, agents } from './state.js';
-import { loadAgents } from './sessions.js';
+import { loadAgents } from './interview_sessions_panel.js';
 
 // NOTE: localStorage key intentionally stable (UX relies on it).
 const ADVANCED_TOGGLE_STORAGE_KEY = 'settings_agents_advanced';

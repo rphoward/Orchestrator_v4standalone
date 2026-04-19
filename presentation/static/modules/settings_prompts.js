@@ -275,7 +275,7 @@ export async function applyPromptToAgent(templateId) {
             method: 'PUT',
             body: JSON.stringify({ prompt: content }),
         });
-        const { loadAgents } = await import('./sessions.js');
+        const { loadAgents } = await import('./interview_sessions_panel.js');
         await loadAgents();
         showStatus(`Applied to ${agentName}. Open Agent Config to review.`, '✅');
         scheduleHideStatus(4000);

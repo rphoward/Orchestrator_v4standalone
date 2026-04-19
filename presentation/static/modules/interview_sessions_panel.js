@@ -1,5 +1,12 @@
 /**
- * sessions.js — Session lifecycle: create, select, delete, welcome screen.
+ * interview_sessions_panel.js — Session lifecycle: create, select, delete,
+ * welcome screen, active stage pointer badge + stage status tracker dots.
+ *
+ * Note on vocabulary: `session.current_agent_id` is the **active stage
+ * pointer** (earliest unfinished stage 1..4), recomputed by the backend every
+ * turn. `session.stage1..4_complete` are the four **stage status** flags shown
+ * as the tracker dots. Agent 5 (Grand Synthesis) is manual-only and never
+ * becomes the pointer.
  */
 
 import { api, getJsonQuiet }                           from './api.js';
@@ -10,13 +17,14 @@ import {
     agents,
     currentSessionId, setCurrentSessionId,
     setAgents,
+    setLastActiveStagePointer,
 } from './state.js';
 
 // ── Lazy imports to avoid circular-dep at parse time ──────────────
-// chat.js depends on sessions.js (for loadSessions), so we import
-// chat functions lazily (at call time) via dynamic helpers.
+// interview_chat_panel.js depends on this module (for loadSessions), so we
+// import chat-panel functions lazily (at call time) via dynamic helpers.
 
-/** Last GET /api/sessions — used for welcome “resume by client name”. */
+/** Last GET /api/sessions — used for welcome "resume by client name". */
 let _sessionsSnapshot = [];
 
 function _sessionsListUrl() {
@@ -311,11 +319,11 @@ export async function selectSession(id, name, options = {}) {
         return;
     }
 
-    updateStageBadge(session.current_agent_id);
-    updateHeaderStageDots(session);
+    updateActiveStagePointerBadge(session.current_agent_id);
+    setLastActiveStagePointer(session.current_agent_id);
+    updateStageStatusTracker(session);
     _setTranscriptButtonEnabled(true);
 
-    // Sidebar privacy: activate when a session is selected
     _setSidebarPrivacyMode(true, session);
 
     const list = document.getElementById('sessionList');
@@ -338,7 +346,7 @@ export async function selectSession(id, name, options = {}) {
     }
 
     const resumeAgentId = session.current_agent_id || 1;
-    const { loadRoutingLogs, displayResponse, showThread } = await import('./chat.js');
+    const { loadRoutingLogs, displayResponse, showThread } = await import('./interview_chat_panel.js');
 
     await loadRoutingLogs();
     document.getElementById('finalizeBtn').disabled = false;
@@ -369,7 +377,6 @@ export async function selectSession(id, name, options = {}) {
             showThread(resumeAgentId, { preloadedMessages: threadMsgs });
         }
     } else {
-        // Restore_partial / empty: stay in ACTIVE_WORKSPACE with a non-blocking banner
         document.getElementById('responseSection')?.classList.add('hidden');
         hideWelcome();
         showThread(resumeAgentId);
@@ -397,7 +404,6 @@ export async function startNewSession({ clientName, title } = {}) {
         return;
     }
 
-    // Close the context modal if it is open
     closeContextModal();
 
     showStatus('Creating and initializing session...');
@@ -411,11 +417,11 @@ export async function startNewSession({ clientName, title } = {}) {
         });
         setCurrentSessionId(res.id);
         document.getElementById('currentSessionTitle').textContent = res.name;
-        updateStageBadge(1);
-        
-        // Also ensure header stage dots are reset
-        updateHeaderStageDots({
-            stage1_complete: false, stage2_complete: false, 
+        updateActiveStagePointerBadge(1);
+        setLastActiveStagePointer(1);
+
+        updateStageStatusTracker({
+            stage1_complete: false, stage2_complete: false,
             stage3_complete: false, stage4_complete: false
         });
 
@@ -425,15 +431,11 @@ export async function startNewSession({ clientName, title } = {}) {
         document.getElementById('finalizeBtn').disabled = false;
         _setTranscriptButtonEnabled(true);
 
-        // Activate sidebar privacy mode immediately — selectSession is skipped
-        // by loadSessions() because currentSessionId is already set at this point.
         _setSidebarPrivacyMode(true, res);
 
-        // Display the init response BEFORE loadSessions to avoid a race
-        // where selectSession → loadThread fires again.
         const firstAgentResponse = initRes.agents && (initRes.agents['1'] || initRes.agents[1]);
         if (firstAgentResponse) {
-            const { displayResponse } = await import('./chat.js');
+            const { displayResponse } = await import('./interview_chat_panel.js');
             displayResponse({
                 agent_id: 1,
                 agent_name: _agentNameFromState(1),
@@ -445,7 +447,7 @@ export async function startNewSession({ clientName, title } = {}) {
         }
 
         await loadSessions();
-        const { loadRoutingLogs } = await import('./chat.js');
+        const { loadRoutingLogs } = await import('./interview_chat_panel.js');
         await loadRoutingLogs();
         await refreshSessionTranscriptCache();
         hideStatus();
@@ -459,7 +461,6 @@ export async function startNewSession({ clientName, title } = {}) {
 export function submitWelcomeForm() {
     const clientName = document.getElementById('newClientName').value.trim();
     const title      = document.getElementById('newSessionName').value.trim();
-    // Reset inputs so they're clean on next open
     document.getElementById('newClientName').value = '';
     document.getElementById('newSessionName').value = '';
     startNewSession({ clientName, title });
@@ -471,7 +472,6 @@ export async function openContextModal() {
     const modal = document.getElementById('contextModal');
     modal.classList.remove('hidden');
 
-    // Populate the existing-sessions list
     const listEl = document.getElementById('contextSessionList');
     listEl.innerHTML = '<p class="text-xs text-themeMuted italic text-center py-2">Loading…</p>';
     try {
@@ -480,7 +480,6 @@ export async function openContextModal() {
             listEl.innerHTML = '<p class="text-xs text-themeMuted italic text-center py-2">No past sessions.</p>';
         } else {
             _sessionsSnapshot = sessions;
-            // Alphabetical sort by client_name (then by session name as tiebreak)
             const sorted = [...sessions].sort((a, b) => {
                 const ca = (a.client_name || '').toLowerCase();
                 const cb = (b.client_name || '').toLowerCase();
@@ -494,7 +493,6 @@ export async function openContextModal() {
         listEl.innerHTML = '<p class="text-xs text-red-500 text-center py-2">Failed to load sessions.</p>';
     }
 
-    // Focus the client name input
     document.getElementById('contextClientName').focus();
 }
 
@@ -518,7 +516,6 @@ export async function deleteSession(event, id) {
     try {
         await api(`/api/sessions/${id}`, { method: 'DELETE' });
         if (currentSessionId === id) setCurrentSessionId(null);
-        // If the context modal is open, refresh its list; otherwise refresh the sidebar
         const modal = document.getElementById('contextModal');
         if (modal && !modal.classList.contains('hidden')) {
             openContextModal();
@@ -637,11 +634,12 @@ export function retryConversationLoad() {
 }
 
 /**
- * Shows the active interview stage index (from session `current_agent_id` or send `current_gate`).
+ * Shows the active stage pointer (earliest unfinished stage 1..4) in the
+ * header badge. Stored in `session.current_agent_id` by the backend.
  * @param {number|string} stageId
  */
-export function updateStageBadge(stageId) {
-    const badge = document.getElementById('currentStageBadge');
+export function updateActiveStagePointerBadge(stageId) {
+    const badge = document.getElementById('activeStagePointerBadge');
     if (stageId) {
         badge.textContent = `Stage: ${stageId}`;
         badge.classList.remove('hidden');
@@ -650,28 +648,32 @@ export function updateStageBadge(stageId) {
     }
 }
 
-export function updateHeaderStageDots(session) {
-    const container = document.getElementById('headerStageDots');
-    if (!container) return; // For safety if missing down the line
+/**
+ * Render the 4 stage status tracker dots from `session.stage1..4_complete`.
+ * Also flips the finalize button into "ready" styling when all four are done.
+ */
+export function updateStageStatusTracker(session) {
+    const container = document.getElementById('stageStatusTrackerDots');
+    if (!container) return;
 
-    if (!session) { 
-        container.classList.add('hidden'); 
-        return; 
+    if (!session) {
+        container.classList.add('hidden');
+        return;
     }
-    
+
     container.classList.remove('hidden');
-    
+
     const stages = [
         { label: 'Brand',    done: session.stage1_complete },
         { label: 'Founder',  done: session.stage2_complete },
         { label: 'Customer', done: session.stage3_complete },
         { label: 'Arch',     done: session.stage4_complete },
     ];
-    
+
     container.innerHTML = stages.map(st =>
         `<span class="stage-dot ${st.done ? 'done' : 'pending'}" title="${st.label}: ${st.done ? 'Complete' : 'Pending'}"></span>`
     ).join('');
-    
+
     const finalizeBtn = document.getElementById('finalizeBtn');
     const isReady = stages.every(st => st.done);
     if (isReady) {
@@ -689,29 +691,31 @@ export async function refreshHeaderState() {
         const sessions = await api(_sessionsListUrl());
         const session = sessions.find(s => s.id === currentSessionId);
         if (session) {
-            updateStageBadge(session.current_agent_id);
-            updateHeaderStageDots(session);
+            updateActiveStagePointerBadge(session.current_agent_id);
+            setLastActiveStagePointer(session.current_agent_id);
+            updateStageStatusTracker(session);
         }
     } catch(e) {}
 }
 
 /**
- * Align manual agent tabs + active thread with `session.current_agent_id`.
- * Auto-route uses that field as the router anchor; call when turning Auto-Route on so the
- * UI matches what the next `/send` will use (not the last manual tab click).
+ * Snap the manual routing picker and open chat thread to the active stage
+ * pointer. Called by `toggleAutoRouting()` in the chat panel when the mode
+ * changes so the user always comes back to "next unfinished" by default.
  */
-export async function syncActiveThreadToSessionCurrentAgent() {
+export async function snapChatToActiveStagePointer() {
     if (!currentSessionId) return;
     try {
         const sessions = await api(_sessionsListUrl());
         const session = sessions.find((s) => s.id === currentSessionId);
         const aid = session?.current_agent_id;
         if (aid == null || aid < 1) return;
-        const { selectAgent, showThread } = await import('./chat.js');
-        selectAgent(aid);
+        setLastActiveStagePointer(aid);
+        const { chooseManualRoutingAgent, showThread } = await import('./interview_chat_panel.js');
+        chooseManualRoutingAgent(aid);
         await showThread(aid);
     } catch (e) {
-        console.warn('syncActiveThreadToSessionCurrentAgent failed:', e);
+        console.warn('snapChatToActiveStagePointer failed:', e);
     }
 }
 
@@ -733,14 +737,12 @@ function _syncAgentLabelsToDom(agentList) {
     const nameById = new Map(agentList.map((a) => [String(a.id), a.name]));
     const ids = Array.from(nameById.keys());
 
-    // Manual selector agent tabs
     document.querySelectorAll('[data-agent]').forEach((btn) => {
         const id = String(btn.dataset.agent);
         if (!ids.includes(id)) return;
         btn.textContent = `${AGENT_ICONS[id] || AGENT_ICONS[Number(id)] || '🤖'} ${nameById.get(id) || ('Agent ' + id)}`;
     });
 
-    // Thread tabs
     document.querySelectorAll('[data-thread]').forEach((btn) => {
         const id = String(btn.dataset.thread);
         if (!ids.includes(id)) return;
@@ -756,7 +758,7 @@ function _syncAgentLabelsToDom(agentList) {
 function _setSidebarPrivacyMode(isActive, session) {
     const list       = document.getElementById('sessionList');
     const activeCard = document.getElementById('activeSidebarSession');
-    if (!list || !activeCard) return; // guard during early init
+    if (!list || !activeCard) return;
 
     if (isActive && session) {
         list.classList.add('hidden');
@@ -792,12 +794,10 @@ function _contextSessionItemHtml(s) {
         ? `<div class="text-[10px] text-themeMuted uppercase tracking-wider font-bold truncate">${escapeHtml(s.client_name)}</div>`
         : '';
 
-    // Summary line (AI-generated if present, else empty)
     const summaryLine = s.summary
         ? `<div class="text-[11px] text-themeMuted italic truncate mt-0.5" title="${escapeHtml(s.summary)}">${escapeHtml(s.summary)}</div>`
         : '';
 
-    // 4 stage completion dots
     const stages = [
         { label: 'Brand',    done: s.stage1_complete },
         { label: 'Founder',  done: s.stage2_complete },
@@ -887,7 +887,6 @@ export async function importSession() {
             showError('Could not open file: ' + err.message);
         }
     } else {
-        // Fallback file input
         let input = document.getElementById('importSessionFallback');
         if (!input) {
             input = document.createElement('input');
@@ -899,7 +898,7 @@ export async function importSession() {
                 const file = e.target.files?.[0];
                 if (!file) return;
                 const text = await file.text();
-                e.target.value = ''; // reset
+                e.target.value = '';
                 await _applyImportedSession(text, file.name);
             });
             document.body.appendChild(input);
@@ -937,8 +936,7 @@ async function _applyImportedSession(jsonText, filename) {
         });
         showStatus('Session imported.', '✅');
         scheduleHideStatus(2000);
-        
-        // Refresh context modal
+
         const modal = document.getElementById('contextModal');
         if (modal && !modal.classList.contains('hidden')) {
             await openContextModal();
@@ -949,11 +947,11 @@ async function _applyImportedSession(jsonText, filename) {
 }
 
 // ── Window bindings for HTML onclicks ───────────────────────────────
-window.startNewSession    = startNewSession;     // payload-driven (new canonical)
-window.submitWelcomeForm  = submitWelcomeForm;   // welcome screen button
-window.openContextModal   = openContextModal;    // + button
+window.startNewSession    = startNewSession;
+window.submitWelcomeForm  = submitWelcomeForm;
+window.openContextModal   = openContextModal;
 window.closeContextModal  = closeContextModal;
-window.submitContextModal = submitContextModal;  // context modal start button
+window.submitContextModal = submitContextModal;
 window.selectSession      = selectSession;
 window.deleteSession      = deleteSession;
 window.exportSession      = exportSession;

@@ -12,7 +12,7 @@ import { showStatus, hideStatus, showError, scheduleHideStatus } from './ui.js';
 import { downloadBlob } from './download.js';
 import { escapeHtml, normalizeSettingsTemperature } from './utils.js';
 import { modelRegistry, agents } from './state.js';
-import { loadAgents } from './sessions.js';
+import { loadAgents } from './interview_sessions_panel.js';
 import { renderAgentSettings } from './settings_agent.js';
 import { renderPromptsTab } from './settings_prompts.js';
 

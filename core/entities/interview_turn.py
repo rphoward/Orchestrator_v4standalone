@@ -100,7 +100,12 @@ class RoutingDecision:
 
 @dataclass(frozen=True)
 class InterviewTurnResult:
-    """Structured result of ConductInterviewTurn.execute."""
+    """Structured result of ConductInterviewTurn.execute.
+
+    `active_stage_pointer` is the earliest unfinished stage in 1..4 after this
+    turn's stage flags were recomputed. The UI uses it to update the stage
+    badge without an extra round-trip to /api/sessions.
+    """
 
     agent_id: int
     agent_name: str
@@ -109,6 +114,7 @@ class InterviewTurnResult:
     response: str
     psychological_phase: str
     session_renamed: str | None
+    active_stage_pointer: int = 0
 
 
 @dataclass(frozen=True)
@@ -120,3 +126,4 @@ class ManualInterviewTurnResult:
     response: str
     routing_reason: str = "Manual override"
     session_renamed: str | None = None
+    active_stage_pointer: int = 0

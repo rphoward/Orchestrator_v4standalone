@@ -81,6 +81,18 @@ Leave the two **`ORCHESTRATOR_*_MODEL`** vars unset to use **Settings** and the 
 
 ---
 
+## Active stage pointer and auto-routing
+
+**Core idea:** `sessions.current_agent_id` (in SQLite) holds the **active stage pointer** — the earliest unfinished stage in 1..4, recomputed from the four `stageN_complete` flags at the end of every turn (auto or manual). When all four flags are true the pointer stays at **4**. Agent 5 (Grand Synthesis) is the manual-only synthesizer and never becomes the pointer.
+
+**Auto-routing veto ([`core/entities/stage_evaluator.py`](core/entities/stage_evaluator.py) `apply_sequential_stage_veto`):** the auto-router may target any agent from **1 up to and including the pointer** — so it can drift back to a finished stage when the consultant won't let go. It **cannot** target past the pointer; any such decision is rewritten to `STAY` on the pointer and the router's original intent is preserved in the `routing_logs.reason` string (`"Sequential stage veto: router wanted agent 3 (status=ADVANCE), forced to stage 2 (next unfinished)"`).
+
+**Manual routing:** the consultant can target any agent 1..5 for one turn. A manual turn can still flip the targeted agent's stage flag (the pointer is always recomputed from flags, so manual forward-motion is earned honestly by the same 2-user-messages rule).
+
+**UI identifiers (`presentation/static/index.html` + `interview_chat_panel.js` + `interview_sessions_panel.js`):** `activeStagePointerBadge` (the `Stage: N` chip), `stageStatusTrackerDots` (the four dots), `autoRoutingToggle` (the checkbox), `manualRoutingAgentPicker` (the tab row), `chooseManualRoutingAgent(n)` (the tab onclicks). Toggling the auto-routing checkbox either direction snaps the manual picker and open chat thread to the pointer.
+
+---
+
 ## SQLite DB hygiene (`runtime/orchestrator.db`)
 
 **What the file holds:** sessions, conversations, routing logs, agents (including per-agent model ids), prompt templates, **`config`** (model registry JSON, router model id, and other keys). Paths default under **`runtime/`** unless **`ORCHESTRATOR_DB_PATH`** points elsewhere.

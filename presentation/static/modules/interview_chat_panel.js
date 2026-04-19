@@ -1,25 +1,29 @@
 /**
- * chat.js — Message input, send flow, thread rendering, routing log.
- * Coordinates with sessions.js for resume (thread preload avoids duplicate fetches).
+ * interview_chat_panel.js — Message input, send flow, thread rendering, routing log.
+ *
+ * Coordinates with interview_sessions_panel.js for resume (thread preload
+ * avoids duplicate fetches) and reads the active stage pointer from state.js
+ * so toggling auto-routing can snap the manual picker to the pointer.
  */
 
 import { api }                             from './api.js';
 import { showStatus, hideStatus }          from './ui.js';
 import { AGENT_ICONS, escapeHtml, formatMarkdown, truncate } from './utils.js';
 import {
-    autoRoute, setAutoRoute,
+    autoRoutingOn, setAutoRoutingOn,
     agents,
-    selectedAgentId, setSelectedAgentId,
-    activeThreadId, setActiveThreadId,
+    manualRoutingTargetAgentId, setManualRoutingTargetAgentId,
+    setOpenChatThreadAgentId,
+    lastActiveStagePointer, setLastActiveStagePointer,
     currentSessionId,
 } from './state.js';
 import {
     loadSessions,
-    updateStageBadge,
+    updateActiveStagePointerBadge,
     refreshHeaderState,
     refreshSessionTranscriptCache,
-    syncActiveThreadToSessionCurrentAgent,
-} from './sessions.js';
+    snapChatToActiveStagePointer,
+} from './interview_sessions_panel.js';
 
 /**
  * True when `#threadContent` shows the empty or load-error placeholder (not real messages).
@@ -29,26 +33,45 @@ function _threadHasPlaceholder(threadEl) {
     return Boolean(threadEl?.querySelector('[data-thread-placeholder]'));
 }
 
-// ── Input & Routing toggles ──────────────────────────────────────
+// ── Auto-routing toggle + manual routing picker ─────────────────
 
-export function toggleAutoRoute() {
-    setAutoRoute(document.getElementById('autoRouteToggle').checked);
-    const selector = document.getElementById('manualSelector');
-    if (autoRoute) {
-        selector.classList.add('hidden');
-        selector.style.pointerEvents = '';
-        selector.style.opacity = '';
-        void syncActiveThreadToSessionCurrentAgent();
+/**
+ * Flip between auto-routing and manual routing.
+ *
+ * Either direction snaps the manual picker and the open chat thread to the
+ * active stage pointer (earliest unfinished stage 1..4). That way switching
+ * modes is always an explicit "come back to forward motion" move.
+ */
+export function toggleAutoRouting() {
+    setAutoRoutingOn(document.getElementById('autoRoutingToggle').checked);
+    const picker = document.getElementById('manualRoutingAgentPicker');
+
+    const pointer = lastActiveStagePointer || 1;
+
+    if (autoRoutingOn) {
+        picker.classList.add('hidden');
+        picker.style.pointerEvents = '';
+        picker.style.opacity = '';
+        // Keep state consistent even in auto mode; the backend will also
+        // respect the pointer on the next turn.
+        void snapChatToActiveStagePointer();
     } else {
-        selector.classList.remove('hidden');
-        selector.style.pointerEvents = 'auto';
-        selector.style.opacity = '1';
-        selectAgent(selectedAgentId);
+        picker.classList.remove('hidden');
+        picker.style.pointerEvents = 'auto';
+        picker.style.opacity = '1';
+        // Preselect the pointer agent and open that thread so the next send
+        // targets the forward-motion stage by default.
+        chooseManualRoutingAgent(pointer);
+        showThread(pointer);
     }
 }
 
-export function selectAgent(id) {
-    setSelectedAgentId(id);
+/**
+ * Highlight one of the manual routing tabs. Does not change the open thread —
+ * the visible thread only changes when `showThread(id)` is called.
+ */
+export function chooseManualRoutingAgent(id) {
+    setManualRoutingTargetAgentId(id);
     document.querySelectorAll('.agent-tab').forEach(
         t => t.classList.toggle('active', parseInt(t.dataset.agent) === id)
     );
@@ -68,14 +91,11 @@ export async function handleSend(e) {
     const message = input.value.trim();
     if (!message) return;
 
-    // Instantly clear & yield the input back to the user
     input.value = '';
     document.getElementById('sendBtn').disabled     = true;
     document.getElementById('sendIcon').innerHTML   = '<span class="spinner"></span>';
     showStatus('Routing & Analyzing...');
 
-    // Optimistic render: echo the user's message immediately so the
-    // UI feels alive while the backend crunches (2-8 s).
     const threadEl = document.getElementById('threadContent');
     if (threadEl) {
         if (_threadHasPlaceholder(threadEl)) threadEl.innerHTML = '';
@@ -92,18 +112,16 @@ export async function handleSend(e) {
     }
 
     try {
-        const result = autoRoute
+        const result = autoRoutingOn
             ? await api(`/api/sessions/${currentSessionId}/send`, {
                 method: 'POST',
                 body:   JSON.stringify({ message }),
               })
             : await api(`/api/sessions/${currentSessionId}/send-manual`, {
                 method: 'POST',
-                body:   JSON.stringify({ agent_id: selectedAgentId, message }),
+                body:   JSON.stringify({ agent_id: manualRoutingTargetAgentId, message }),
               });
 
-        // displayResponse → showThread → loadThread will fully re-render
-        // threadContent from the DB, which naturally replaces the ghost div.
         displayResponse(result);
         await loadRoutingLogs();
         await refreshSessionTranscriptCache();
@@ -115,7 +133,6 @@ export async function handleSend(e) {
         await refreshHeaderState();
     } catch (err) {
         console.error('Send failed:', err);
-        // On error, remove the ghost so the user doesn't see a phantom message
         if (threadEl) {
             threadEl.querySelectorAll('[data-optimistic="true"]').forEach(g => g.remove());
         }
@@ -136,16 +153,14 @@ export async function handleSend(e) {
 export function displayResponse(result, options = {}) {
     const responseBox = document.getElementById('responseSection');
     responseBox.classList.remove('hidden');
-    
-    // Add pulse animation to indicate update
+
     responseBox.classList.remove('pulse-route');
-    void responseBox.offsetWidth; // trigger reflow
+    void responseBox.offsetWidth;
     responseBox.classList.add('pulse-route');
 
-    const agentId = result.agent_id || selectedAgentId;
+    const agentId = result.agent_id || manualRoutingTargetAgentId;
     document.getElementById('routeIcon').textContent   = AGENT_ICONS[agentId] || '🤖';
-    
-    // Explicitly update Route Agent name, falling back dynamically
+
     const nameById = new Map((agents || []).map((a) => [String(a.id), a.name]));
     const agentName = result.agent_name || nameById.get(String(agentId)) || ('Agent ' + agentId);
     const routeLabel =
@@ -153,12 +168,17 @@ export function displayResponse(result, options = {}) {
     document.getElementById('routeAgent').textContent  = `${routeLabel} ${agentName}`;
     document.getElementById('routeReason').textContent = result.routing_reason || '';
 
-    // Subtle update in the "agents box" above the input
-    if (autoRoute) {
-        selectAgent(agentId);
+    if (autoRoutingOn) {
+        chooseManualRoutingAgent(agentId);
     }
 
-    if (result.current_gate) updateStageBadge(result.current_gate);
+    // The turn result ships the active stage pointer so the badge can update
+    // without a second round-trip. Mirror it into state so toggleAutoRouting
+    // can snap the picker without fetching /api/sessions.
+    if (typeof result.active_stage_pointer === 'number' && result.active_stage_pointer > 0) {
+        updateActiveStagePointerBadge(result.active_stage_pointer);
+        setLastActiveStagePointer(result.active_stage_pointer);
+    }
 
     const parsed = parseAgentResponse(result.response || '');
     const fullQuestion = [parsed.preamble, parsed.question].filter(Boolean).join('\n\n');
@@ -167,7 +187,6 @@ export function displayResponse(result, options = {}) {
     const analysisDetails = document.getElementById('analysisContent').closest('details');
     const pivotDetails    = document.getElementById('pivotContent').closest('details');
 
-    // Keep details collapsed by default — icons signal clickability
     if (parsed.analysis) {
         document.getElementById('analysisContent').innerHTML = formatMarkdown(parsed.analysis);
         if (analysisDetails) {
@@ -196,8 +215,7 @@ export function displayResponse(result, options = {}) {
 
 export function parseAgentResponse(text) {
     const r      = { preamble: '', analysis: '', pivot: '', question: '' };
-    
-    // Extract any text before the SILENT ANALYSIS flag (e.g. the Honest Contract preamble)
+
     const preambleMatch = text.match(/^([\s\S]*?)(?=🧠\s*(?:SILENT ANALYSIS|Silent Analysis))/i);
     if (preambleMatch && preambleMatch[1].trim()) {
         r.preamble = preambleMatch[1].trim();
@@ -206,11 +224,11 @@ export function parseAgentResponse(text) {
     const aMatch = text.match(/🧠\s*(?:SILENT ANALYSIS|Silent Analysis)[^\n]*\n([\s\S]*?)(?=🎯|$)/i);
     const pMatch = text.match(/🎯\s*(?:TACTICAL PIVOT|Tactical Pivot)[^\n]*\n([\s\S]*?)(?=☕|$)/i);
     const qMatch = text.match(/☕\s*(?:YOUR NEXT QUESTION|THE CONSULTANT'S SCRIPT|Next Question)[^\n]*\n([\s\S]*?)$/i);
-    
+
     if (aMatch) r.analysis = aMatch[1].trim();
     if (pMatch) r.pivot    = pMatch[1].trim();
     if (qMatch) r.question = qMatch[1].trim();
-    
+
     if (!r.analysis && !r.pivot && !r.question) r.question = text;
     return r;
 }
@@ -221,7 +239,7 @@ export function parseAgentResponse(text) {
  * Activates the thread tab and loads messages for the agent (or uses `preloadedMessages` from the caller).
  */
 export function showThread(agentId, opts = {}) {
-    setActiveThreadId(agentId);
+    setOpenChatThreadAgentId(agentId);
     document.querySelectorAll('.thread-tab').forEach(
         t => t.classList.toggle('active', parseInt(t.dataset.thread) === agentId)
     );
@@ -247,15 +265,12 @@ export async function loadThread(agentId, opts = {}) {
             return;
         }
 
-        // Resolve agent name: per-agent endpoint doesn't JOIN agent table,
-        // so m.agent_name is undefined. Look it up from the loaded agents list.
         const { agents } = await import('./state.js');
         const agentRecord = agents.find(a => a.id === agentId);
         const agentLabel  = agentRecord ? agentRecord.name : `Agent ${agentId}`;
 
         c.innerHTML = msgs.map(m => {
             let displayContent = m.content;
-            // DB stores role as 'assistant', not 'model'
             if (m.role === 'assistant' && m.message_type !== 'summary') {
                 const p = parseAgentResponse(m.content);
                 if (p.analysis || p.pivot || p.question) {
@@ -316,8 +331,8 @@ export async function loadRoutingLogs() {
 }
 
 // ── Window bindings for HTML onclicks ───────────────────────────────
-window.toggleAutoRoute    = toggleAutoRoute;
-window.selectAgent        = selectAgent;
-window.handleInputKeydown = handleInputKeydown;
-window.handleSend         = handleSend;
-window.showThread         = showThread;
+window.toggleAutoRouting        = toggleAutoRouting;
+window.chooseManualRoutingAgent = chooseManualRoutingAgent;
+window.handleInputKeydown       = handleInputKeydown;
+window.handleSend               = handleSend;
+window.showThread               = showThread;

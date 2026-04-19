@@ -15,7 +15,10 @@ from orchestrator_v4.core.entities.interview_turn import (
     TurnConversationLine,
 )
 from orchestrator_v4.core.entities.pierce_holt_engine import get_tone_directive
-from orchestrator_v4.core.entities.stage_evaluator import evaluate_stage_completion
+from orchestrator_v4.core.entities.stage_evaluator import (
+    earliest_unfinished_stage,
+    evaluate_stage_completion,
+)
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
 
@@ -158,7 +161,11 @@ class ConductManualInterviewTurn:
             ctx.stage_flags(),
         )
 
-        next_current = agent_id
+        # session.current_agent_id holds the active stage pointer (earliest
+        # unfinished stage 1..4). A manual turn can still flip the targeted
+        # agent's stage flag, which may move the pointer; otherwise it stays
+        # where it was. Who handled THIS turn is still `agent_id` in the result.
+        next_current = earliest_unfinished_stage(new_flags)
 
         session_renamed: str | None = None
         new_name = ctx.name
@@ -179,4 +186,5 @@ class ConductManualInterviewTurn:
             response=reply,
             routing_reason=MANUAL_ROUTING_REASON,
             session_renamed=session_renamed,
+            active_stage_pointer=next_current,
         )
