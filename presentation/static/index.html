@@ -109,6 +109,12 @@
             <div id="welcomeSection" class="card text-center py-16 mt-8 shadow-sm hidden">
                 <p class="text-5xl mb-6">☕</p>
                 <h2 class="t-display text-2xl text-themeText mb-3">Ready for Discovery</h2>
+                <div id="welcomeContinueBar" class="hidden max-w-md mx-auto mb-6">
+                    <button type="button" onclick="continueLastStoredSession()"
+                            class="btn-secondary w-full text-sm py-3 px-4 shadow-sm">
+                        ↩ Continue last session: <span id="welcomeContinueLabel" class="font-semibold"></span>
+                    </button>
+                </div>
                 <p class="text-themeMuted mb-8 max-w-md mx-auto text-sm leading-relaxed">
                     Start a new session to initialize your AI agents. They'll prepare opening questions to organically guide the linear discovery workflow.
                 </p>
@@ -406,6 +412,6 @@
         </div>
     </div>
 
-    <script type="module" src="/static/app.js?v=21"></script>
+    <script type="module" src="/static/app.js?v=22"></script>
 </body>
 </html>

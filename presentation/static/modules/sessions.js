@@ -29,6 +29,23 @@ function _hideSessionBoot() {
     document.getElementById('sessionBootPlaceholder')?.classList.add('hidden');
 }
 
+/** Show or hide the "Continue last session" strip on the welcome screen. */
+function _refreshWelcomeContinueBar() {
+    const bar = document.getElementById('welcomeContinueBar');
+    const lab = document.getElementById('welcomeContinueLabel');
+    if (!bar || !lab) return;
+    const storedId = localStorage.getItem('currentSessionId');
+    const s = storedId
+        ? _sessionsSnapshot.find((x) => String(x.id) === storedId)
+        : null;
+    if (s) {
+        lab.textContent = s.name || `Session ${s.id}`;
+        bar.classList.remove('hidden');
+    } else {
+        bar.classList.add('hidden');
+    }
+}
+
 function _hideConversationRestoreBanner() {
     document.getElementById('conversationRestoreBanner')?.classList.add('hidden');
 }
@@ -254,17 +271,11 @@ export async function loadSessions() {
 
         list.innerHTML = sessions.map(s => _sessionItemHtml(s)).join('');
 
-        // ── State machine: INITIALIZING → ACTIVE_WORKSPACE | FIRST_LAUNCH ──
-        const storedId = localStorage.getItem('currentSessionId');
-        const storedSession = storedId
-            ? sessions.find(s => String(s.id) === storedId)
-            : null;
-
-        if (!currentSessionId && storedSession) {
-            // ACTIVE_WORKSPACE: silently resume without touching the welcome screen
-            await selectSession(storedSession.id, storedSession.name, { sessions });
-        } else if (!currentSessionId) {
-            // FIRST_LAUNCH: no valid stored session — show welcome screen
+        // Always show the startup (welcome) screen on cold load when no session is
+        // already selected in this tab. Silent auto-resume from localStorage hid the
+        // welcome UI on every refresh — users could not reach "Ready for Discovery".
+        // One-click "Continue last session" restores the old fast path (see below).
+        if (!currentSessionId) {
             showWelcome();
         }
 
@@ -533,6 +544,20 @@ export function showWelcome() {
     const search = document.getElementById('welcomeResumeSearch');
     if (search) search.value = '';
     _renderWelcomeClientList('');
+    _refreshWelcomeContinueBar();
+}
+
+/** Welcome-screen: resume the session id stored in localStorage (same as old auto-resume). */
+export async function continueLastStoredSession() {
+    const storedId = localStorage.getItem('currentSessionId');
+    const s = storedId
+        ? _sessionsSnapshot.find((x) => String(x.id) === storedId)
+        : null;
+    if (!s) {
+        showError('No saved session to continue.', 'validation_error');
+        return;
+    }
+    await selectSession(s.id, s.name, { sessions: _sessionsSnapshot });
 }
 
 export function hideWelcome() {
@@ -937,5 +962,6 @@ window.onWelcomeResumeSearchInput = onWelcomeResumeSearchInput;
 window.selectWelcomeClient = selectWelcomeClient;
 window.welcomeResumeBack  = welcomeResumeBack;
 window.retryConversationLoad = retryConversationLoad;
+window.continueLastStoredSession = continueLastStoredSession;
 window.openSessionTranscript  = openSessionTranscript;
 window.closeSessionTranscript = closeSessionTranscript;

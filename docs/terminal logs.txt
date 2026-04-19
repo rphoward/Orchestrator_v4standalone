@@ -1,0 +1,396 @@
+ * Serving Flask app 'app'
+ * Debug mode: off
+2026-04-19 03:34:40,547 INFO werkzeug: WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5001
+2026-04-19 03:34:40,548 INFO werkzeug: Press CTRL+C to quit
+2026-04-19 03:34:59,002 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET / HTTP/1.1" 304 -
+2026-04-19 03:34:59,217 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/style.css?v=23 HTTP/1.1" 304 -
+2026-04-19 03:34:59,345 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/app.js?v=21 HTTP/1.1" 304 -
+2026-04-19 03:34:59,354 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/ui.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,659 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/interview_ui_press_feedback.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,659 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/api.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,660 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/sessions.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,663 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/chat.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,665 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/reports.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,666 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/settings.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,981 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/utils.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,981 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/state.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,984 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/settings_agent.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,986 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/download.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,988 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/settings_registry.js HTTP/1.1" 304 -
+2026-04-19 03:34:59,989 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:34:59] "GET /static/modules/settings_prompts.js HTTP/1.1" 304 -
+2026-04-19 03:35:00,311 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/sessions HTTP/1.1" 200 -
+2026-04-19 03:35:00,315 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/agents HTTP/1.1" 200 -
+2026-04-19 03:35:00,322 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/models HTTP/1.1" 200 -
+2026-04-19 03:35:00,372 ERROR app: Unhandled exception: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\werkzeug\routing\map.py", line 629, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2026-04-19 03:35:00,378 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /favicon.ico HTTP/1.1" 500 -
+2026-04-19 03:35:00,584 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/sessions/1/conversations HTTP/1.1" 200 -
+2026-04-19 03:35:00,631 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/sessions/1/routing-logs HTTP/1.1" 200 -
+2026-04-19 03:35:00,910 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/sessions HTTP/1.1" 200 -
+2026-04-19 03:35:00,975 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:35:00] "GET /api/sessions/1/conversations?agent_id=1 HTTP/1.1" 200 -
+2026-04-19 03:37:34,352 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:37:34] "GET /api/sessions HTTP/1.1" 200 -
+2026-04-19 03:37:59,464 ERROR app: Unhandled exception: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 891, in dispatch_request
+    self.raise_routing_exception(req)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 500, in raise_routing_exception
+    raise request.routing_exception  # type: ignore[misc]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\ctx.py", line 362, in match_request
+    result = self.url_adapter.match(return_rule=True)  # type: ignore
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\werkzeug\routing\map.py", line 629, in match
+    raise NotFound() from None
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2026-04-19 03:37:59,465 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:37:59] "GET /favicon.ico HTTP/1.1" 500 -
+2026-04-19 03:37:59,834 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:37:59] "POST /api/sessions HTTP/1.1" 201 -
+2026-04-19 03:38:00,139 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=1 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=1 cross_context_len=0 phase_len=195
+2026-04-19 03:38:00,139 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:38:10,429 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:38:10,510 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=2 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=1 cross_context_len=0 phase_len=195
+2026-04-19 03:38:10,510 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:38:11,310 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:38:11,379 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=3 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=1 cross_context_len=0 phase_len=246
+2026-04-19 03:38:11,379 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:38:12,153 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:38:12,233 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=4 model='gemini-3.1-flash-lite-preview' thinking_level='MEDIUM' include_thoughts=True temperature='' history_len=1 cross_context_len=0 phase_len=246
+2026-04-19 03:38:12,234 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:38:12,897 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:38:12,899 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:38:12] "POST /api/sessions/2/initialize HTTP/1.1" 200 -
+2026-04-19 03:38:12,911 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:38:12] "GET /api/sessions/2/conversations?agent_id=1 HTTP/1.1" 200 -
+2026-04-19 03:38:13,220 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:38:13] "GET /api/sessions HTTP/1.1" 200 -
+2026-04-19 03:38:13,595 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:38:13] "GET /api/sessions/2/routing-logs HTTP/1.1" 200 -
+2026-04-19 03:38:13,863 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:38:13] "GET /api/sessions/2/conversations HTTP/1.1" 200 -
+2026-04-19 03:38:46,484 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent call model=gemini-3.1-flash-lite-preview current_agent_id=1 agent_hint_ids=[1, 2, 3, 4, 5]
+2026-04-19 03:38:46,484 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:38:49,337 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:38:49,338 WARNING orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent Gemini call failed; defaulting to STAY on current agent
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\infrastructure\ai\gemini_interview_llm_gateway.py", line 104, in route_intent
+    response = self._client.models.generate_content(
+        model=self._router_model,
+        contents=[{"role": "user", "parts": [{"text": prompt}]}],
+        config=config,
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 6276, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 4730, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1537, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1332, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1309, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 186, in raise_error
+    raise ServerError(status_code, response_json, response)
+google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-04-19 03:38:49,555 INFO orchestrator_v4.core.use_cases.conduct_interview_turn: conduct_interview_turn target_agent_id=1 agent_entry.model='gemini-3.1-flash-lite-preview' thinking_level='LOW' temperature='' include_thoughts=False system_prompt_len=6267
+2026-04-19 03:38:49,557 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=1 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=2 cross_context_len=0 phase_len=195
+2026-04-19 03:38:49,559 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:39:21,072 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:39:21,073 ERROR app: Unhandled exception: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 77, in send_message
+    return conduct_turn(session_id)
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 69, in conduct_turn
+    result = bootstrap.conduct_interview_turn.execute(session_id, user_input)
+  File "C:\Project\orchestrator_v4standalone\core\use_cases\conduct_interview_turn.py", line 153, in execute
+    reply = self._llm_gateway.get_response(
+        user_input=text,
+    ...<8 lines>...
+        psychological_phase=tone,
+    )
+  File "C:\Project\orchestrator_v4standalone\infrastructure\ai\gemini_interview_llm_gateway.py", line 208, in get_response
+    response = self._client.models.generate_content(
+        model=effective_model,
+        contents=contents,
+        config=config,
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 6276, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 4730, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1537, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1332, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1309, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 186, in raise_error
+    raise ServerError(status_code, response_json, response)
+google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-04-19 03:39:21,077 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:39:21] "POST /api/sessions/2/send HTTP/1.1" 500 -
+2026-04-19 03:40:10,054 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent call model=gemini-3.1-flash-lite-preview current_agent_id=1 agent_hint_ids=[1, 2, 3, 4, 5]
+2026-04-19 03:40:10,054 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:40:14,214 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:40:14,215 WARNING orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent Gemini call failed; defaulting to STAY on current agent
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\infrastructure\ai\gemini_interview_llm_gateway.py", line 104, in route_intent
+    response = self._client.models.generate_content(
+        model=self._router_model,
+        contents=[{"role": "user", "parts": [{"text": prompt}]}],
+        config=config,
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 6276, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 4730, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1537, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1332, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1309, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 186, in raise_error
+    raise ServerError(status_code, response_json, response)
+google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-04-19 03:40:14,250 INFO orchestrator_v4.core.use_cases.conduct_interview_turn: conduct_interview_turn target_agent_id=1 agent_entry.model='gemini-3.1-flash-lite-preview' thinking_level='LOW' temperature='' include_thoughts=False system_prompt_len=6267
+2026-04-19 03:40:14,251 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=1 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=3 cross_context_len=0 phase_len=195
+2026-04-19 03:40:14,251 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:40:19,777 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:40:19,778 ERROR app: Unhandled exception: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 77, in send_message
+    return conduct_turn(session_id)
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 69, in conduct_turn
+    result = bootstrap.conduct_interview_turn.execute(session_id, user_input)
+  File "C:\Project\orchestrator_v4standalone\core\use_cases\conduct_interview_turn.py", line 153, in execute
+    reply = self._llm_gateway.get_response(
+        user_input=text,
+    ...<8 lines>...
+        psychological_phase=tone,
+    )
+  File "C:\Project\orchestrator_v4standalone\infrastructure\ai\gemini_interview_llm_gateway.py", line 208, in get_response
+    response = self._client.models.generate_content(
+        model=effective_model,
+        contents=contents,
+        config=config,
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 6276, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 4730, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1537, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1332, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1309, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 186, in raise_error
+    raise ServerError(status_code, response_json, response)
+google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-04-19 03:40:19,782 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:40:19] "POST /api/sessions/2/send HTTP/1.1" 500 -
+2026-04-19 03:43:36,819 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:43:36] "GET /api/sessions HTTP/1.1" 200 -
+2026-04-19 03:43:41,724 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:43:41] "GET /api/sessions/1/conversations HTTP/1.1" 200 -
+2026-04-19 03:43:42,049 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:43:42] "GET /api/sessions/1/routing-logs HTTP/1.1" 200 -
+2026-04-19 03:44:38,016 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent call model=gemini-3.1-flash-lite-preview current_agent_id=1 agent_hint_ids=[1, 2, 3, 4, 5]
+2026-04-19 03:44:38,016 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:45:06,046 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 200 OK"
+2026-04-19 03:45:06,058 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent raw response.text[:200]='{"agent_id": 1, "workflow_status": "STAY", "reason": "The user\'s input is too vague and lacks the necessary depth regarding the organization\'s telos or horizontal differentiation required to advance f' (total_len=214)
+2026-04-19 03:45:06,063 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: route_intent parsed target_agent_id=1 status=STAY reason="The user's input is too vague and lacks the necessary depth regarding the organization's telos or horizontal differentiation required to advance from stage 1."
+2026-04-19 03:45:06,082 INFO orchestrator_v4.core.use_cases.conduct_interview_turn: conduct_interview_turn target_agent_id=1 agent_entry.model='gemini-3.1-flash-lite-preview' thinking_level='LOW' temperature='' include_thoughts=False system_prompt_len=6267
+2026-04-19 03:45:06,084 INFO orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway: get_response call agent_id=1 model='gemini-3.1-flash-lite-preview' thinking_level='LOW' include_thoughts=False temperature='' history_len=15 cross_context_len=6 phase_len=195
+2026-04-19 03:45:06,084 INFO google_genai.models: AFC is enabled with max remote calls: 10.
+2026-04-19 03:45:26,908 INFO httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent "HTTP/1.1 503 Service Unavailable"
+2026-04-19 03:45:26,909 ERROR app: Unhandled exception: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+Traceback (most recent call last):
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 77, in send_message
+    return conduct_turn(session_id)
+  File "C:\Project\orchestrator_v4standalone\presentation\interview_session_routes.py", line 69, in conduct_turn
+    result = bootstrap.conduct_interview_turn.execute(session_id, user_input)
+  File "C:\Project\orchestrator_v4standalone\core\use_cases\conduct_interview_turn.py", line 153, in execute
+    reply = self._llm_gateway.get_response(
+        user_input=text,
+    ...<8 lines>...
+        psychological_phase=tone,
+    )
+  File "C:\Project\orchestrator_v4standalone\infrastructure\ai\gemini_interview_llm_gateway.py", line 208, in get_response
+    response = self._client.models.generate_content(
+        model=effective_model,
+        contents=contents,
+        config=config,
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 6276, in generate_content
+    response = self._generate_content(
+        model=model, contents=contents, config=parsed_config
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\models.py", line 4730, in _generate_content
+    response = self._api_client.request(
+        'post', path, request_dict, http_options
+    )
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1537, in request
+    response = self._request(http_request, http_options, stream=False)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1332, in _request
+    return self._retry(self._request_once, http_request, stream)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 470, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 371, in iter
+    result = action(retry_state)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ~~~~~~~~~~~~~~~~~^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 443, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\rphow.LITTLESPARK\AppData\Roaming\uv\python\cpython-3.14.2-windows-x86_64-none\Lib\concurrent\futures\_base.py", line 395, in __get_result
+    raise self._exception
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\tenacity\__init__.py", line 473, in __call__
+    result = fn(*args, **kwargs)
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\_api_client.py", line 1309, in _request_once
+    errors.APIError.raise_for_response(response)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 155, in raise_for_response
+    cls.raise_error(response.status_code, response_json, response)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project\orchestrator_v4standalone\.venv\Lib\site-packages\google\genai\errors.py", line 186, in raise_error
+    raise ServerError(status_code, response_json, response)
+google.genai.errors.ServerError: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}
+2026-04-19 03:45:26,914 INFO werkzeug: 127.0.0.1 - - [19/Apr/2026 03:45:26] "POST /api/sessions/1/send HTTP/1.1" 500 -
+
+Start your machine and open C:\Project\orchestrator_v4standalone.
+In .env, uncomment and set both ORCHESTRATOR_ROUTER_MODEL and ORCHESTRATOR_AGENT_MODEL to a stable GA id (for example gemini-flash-latest), or pick a non-preview model under Settings -> Models in the UI after startup.
+Start the dev server: python run_dev.py (keep it running).
+Open http://127.0.0.1:5001. Auto-Route ON. Send one message on an existing (old) session; wait for reply or error.
+Click "New Session". Send one message; wait for reply or error.
+Send one more message in the new session; wait for reply or error.
+Paste back the contents of debug-637fa6.log, or just say "ready" and I will read it. Press Proceed / Mark as fixed when done.
