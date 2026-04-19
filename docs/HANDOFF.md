@@ -42,6 +42,8 @@ This repo is **Orchestrator v4** as a **standalone** Flask app: interview sessio
 | [monorepo-agents-rescue-checklist.md](monorepo-agents-rescue-checklist.md) | Optional diff against old monorepo `AGENTS.md` — what to ignore vs rescue |
 | [../.cursor/rules/](../.cursor/rules/) | Cursor project rules (`.mdc`) |
 | [../.cursor/plans/README.md](../.cursor/plans/README.md) | Where active Cursor plans live; skills note |
+| [BUTTON_UI_FEEDBACK_PLAN.md](../.cursor/plans/BUTTON_UI_FEEDBACK_PLAN.md) | Button press + optional UI sounds (static only); YAML tracks completion |
+| [DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) | Daily driver parchment + fonts + grain (not executed until YAML completed) |
 
 ---
 
@@ -74,12 +76,34 @@ All under `.cursor/rules/`. **`alwaysApply: true`** on architecture, conduct, sa
 
 - Bulk rename of `sessions.js`, `chat.js`, `reports.js`, `settings*.js` — only when you are already editing those areas.
 - Copy old **`.cursor/plans/archive/`** from a backup monorepo into this repo — optional history only.
-- Run a **full regression** / add **pytest** when you are ready; smoke is not full coverage.
+- **Pytest is wired** (`[project.optional-dependencies] dev`, `[tool.pytest.ini_options]`, [tests/test_core_entities.py](../tests/test_core_entities.py)) — grow coverage over time; smoke is still not full regression.
 - Mine old monorepo **`AGENTS.md`** using **`docs/monorepo-agents-rescue-checklist.md`** — do not paste huge legacy blocks into slim `AGENTS.md`.
 
 ---
 
-## 9. Verify now
+## 9. Recent landings (update when you ship)
+
+Use this as the **session bridge**: what changed recently on the static UI and tests. If it drifts, delete stale bullets.
+
+**Button press + optional UI sounds (presentation static only)**
+
+- [presentation/static/style.css](../presentation/static/style.css) — `:focus-visible`, `:active` press (filter + reduced-motion transform on primary/send), secondary/icon press, light tab press; `.settings-interface-strip` for the Settings chrome row.
+- [presentation/static/index.html](../presentation/static/index.html) — **Interface** row between Settings header and tab bar: checkbox **`id="uiSoundsEnabled"`**, label `for=`; cache-bust query on `style.css` / `app.js` as needed.
+- [presentation/static/modules/interview_ui_press_feedback.js](../presentation/static/modules/interview_ui_press_feedback.js) — `initUiFeedback()`, localStorage key **`orchestrator_v4_ui_sounds_enabled`**, Web Audio click on delegated `pointerdown` when enabled.
+- [presentation/static/app.js](../presentation/static/app.js) — imports shell + calls `initUiFeedback()` early in `DOMContentLoaded`.
+- Plan truth: [.cursor/plans/BUTTON_UI_FEEDBACK_PLAN.md](../.cursor/plans/BUTTON_UI_FEEDBACK_PLAN.md) — YAML `status` should be `completed` when the slice is merged; if the file still says `pending`, reconcile or treat the plan as stale.
+
+**Tests**
+
+- From repo root: `uv pip install -e ".[dev]"` then `uv run pytest` (or `pytest` in the same env). Two smoke tests on core entities today — expand when you touch behavior.
+
+**Next UI (not executed in this handoff snapshot)**
+
+- **Next aesthetic (planned, not assumed shipped):** [.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md](../.cursor/plans/DAILY_DRIVER_PARCHMENT_JOURNAL_PLAN.md) — daily driver parchment, warm card, Fraunces + IBM Plex Sans, paper grain. Execute only after explicit go-ahead; confirm with `style.css` `:root` and `index.html` Tailwind `themeBg` / `themeSurface` if unsure whether it merged.
+
+---
+
+## 10. Verify now
 
 From repo root:
 
@@ -89,8 +113,10 @@ python run_dev.py --smoke
 
 Expect exit code **0**. For UI: `python run_dev.py` then `http://127.0.0.1:5001` (unless `ORCHESTRATOR_PORT`). You need **`.env`** with `GEMINI_API_KEY` for live Gemini; **`uv`** on PATH if you want auto `.venv` creation (see `DEV-STANDALONE.md`).
 
+After Python changes, also run **`uv run pytest`** (or `pytest`) so the small test suite stays green.
+
 ---
 
-## 10. Stale warning again
+## 11. Stale warning again
 
 This file is a **map**, not a test suite. When behavior or paths change, update **`docs/HANDOFF.md`** and the **README** docs table so the next handoff stays honest.
