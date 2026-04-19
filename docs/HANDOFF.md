@@ -40,6 +40,7 @@ This repo is **Orchestrator v4** as a **standalone** Flask app: interview sessio
 |------|-----|
 | [README.md](../README.md) | GitHub-facing quick start, link hub |
 | [DEV-STANDALONE.md](../DEV-STANDALONE.md) | Deep runbook: env, SQLite, ports, verification checklist, post-migration honesty |
+| [DEBUG_INTERVIEW_CHAT.md](DEBUG_INTERVIEW_CHAT.md) | Paste into a fresh chat: stub vs echo vs routing, what shipped, env, files, logs to capture |
 | [AGENTS.md](../AGENTS.md) | Short agent/human contract + where rules live |
 | [monorepo-agents-rescue-checklist.md](monorepo-agents-rescue-checklist.md) | Optional diff against old monorepo `AGENTS.md` — what to ignore vs rescue |
 | [../.cursor/rules/](../.cursor/rules/) | Cursor project rules (`.mdc`) |
@@ -109,7 +110,7 @@ Use this as the **session bridge**: what changed recently on the static UI and t
 
 **Next session — read this first**
 
-- [docs/NEXT_SESSION_HANDOFF.md](NEXT_SESSION_HANDOFF.md) — one-page brief to diagnose the chat "echo" bug with the new logs (repro, decision tree, files to open).
+- [docs/NEXT_SESSION_HANDOFF.md](NEXT_SESSION_HANDOFF.md) — one-page brief to diagnose the chat "echo" bug with the new logs (repro, decision tree, files to open). **Update (echo, case 1):** [infrastructure/ai/gemini_interview_llm_gateway.py](../infrastructure/ai/gemini_interview_llm_gateway.py) `get_response` now returns assembled non-thought `Part` text when `include_thoughts=True` (instead of `response.text` only) and raises if the model returns only thought parts; re-test a turn with agent 4 and watch the same INFO lines.
 
 ---
 
