@@ -21,6 +21,10 @@ globs:
 - One adapter (or a small related set) per port contract.
 - Keep storage and HTTP details out of `core/`.
 
+## Error model
+
+Adapters must not raise for transient I/O failures (API timeout, empty response, unparseable payload) when the port documents a sentinel-value contract — return a value the use case can route on, not an exception. Reserve exceptions for programmer errors (misuse, missing required configuration, contract violations that mean a later layer is wrong).
+
 ## Naming
 
 - Name both tech and role, e.g. `SqliteInterviewSessionTurnStore`—not bare `Gateway` / `Repository`.

@@ -48,6 +48,9 @@ from orchestrator_v4.core.use_cases.update_interview_session import UpdateInterv
 from orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway import (
     GeminiInterviewLlmGateway,
 )
+from orchestrator_v4.infrastructure.ai.gemini_stage_completion_judge import (
+    GeminiStageCompletionJudge,
+)
 from orchestrator_v4.infrastructure.persistence.cached_prompt_file_reader import (
     CachedPromptFileReader,
 )
@@ -55,6 +58,9 @@ from orchestrator_v4.infrastructure.persistence.sqlite_interview_session_turn_st
     SqliteInterviewSessionTurnStore,
 )
 from orchestrator_v4.infrastructure.stubs.fake_interview_llm_gateway import FakeInterviewLlmGateway
+from orchestrator_v4.infrastructure.stubs.fake_stage_completion_judge import (
+    FakeStageCompletionJudge,
+)
 from orchestrator_v4.infrastructure.persistence.sqlite_agent_configuration_store import (
     SqliteAgentConfigurationStore,
 )
@@ -178,8 +184,10 @@ def _resolved_agent_fallback_model_id() -> str:
 
 
 def rebind_llm_gateway() -> None:
-    """Rebuild the LLM gateway from the current API key and model registry (and env overrides)."""
-    global _llm_gateway, conduct_interview_turn, initialize_session, conduct_manual_turn, finalize_session
+    """Rebuild the LLM gateway + stage-completion judge from the current API key
+    and model registry (and env overrides)."""
+    global _llm_gateway, _stage_completion_judge, stage_completion_judge
+    global conduct_interview_turn, initialize_session, conduct_manual_turn, finalize_session
 
     if gemini_api_key_configured and _gemini_api_key:
         rid = _resolved_router_model_id()
@@ -196,20 +204,42 @@ def rebind_llm_gateway() -> None:
             router_model=rid,
             agent_model=afid,
         )
-        _LOG.info("LLM gateway: live Gemini API (router=%s)", rid)
+        _stage_completion_judge = GeminiStageCompletionJudge(
+            api_key=_gemini_api_key,
+            prompt_cache=_prompt_cache,
+            judge_model=afid,
+        )
+        _LOG.info(
+            "LLM gateway: live Gemini API (router=%s); stage_completion_judge=%s",
+            rid,
+            afid,
+        )
     else:
         _llm_gateway = FakeInterviewLlmGateway()
+        # ``judge_error:`` prefix triggers the use-case heuristic fallback so
+        # offline dev, pytest, and --smoke still advance stage flags by the
+        # 2-user-chat rule. See .cursor/plans/stage-completion-judge_*.plan.md
+        # slice 8 for the rationale.
+        _stage_completion_judge = FakeStageCompletionJudge(
+            default_reason="judge_error: offline stub"
+        )
         _LOG.warning(
             "LLM gateway: offline stub — no GEMINI_API_KEY at startup. "
             "Routing logs show reason %r; replies prefix your message with %r (no API calls). "
+            "Stage-completion judge falls back to the 2-user-chat heuristic. "
             "Put GEMINI_API_KEY in .env next to bootstrap.py or save a key under Settings.",
             "stub-route",
             "echo:",
         )
 
-    conduct_interview_turn = ConductInterviewTurn(_turn_store, _llm_gateway)
+    stage_completion_judge = _stage_completion_judge
+    conduct_interview_turn = ConductInterviewTurn(
+        _turn_store, _llm_gateway, _stage_completion_judge
+    )
     initialize_session = InitializeInterviewSession(_turn_store, _llm_gateway)
-    conduct_manual_turn = ConductManualInterviewTurn(_turn_store, _llm_gateway)
+    conduct_manual_turn = ConductManualInterviewTurn(
+        _turn_store, _llm_gateway, _stage_completion_judge
+    )
     finalize_session = FinalizeInterviewSession(_turn_store, _llm_gateway)
 
 

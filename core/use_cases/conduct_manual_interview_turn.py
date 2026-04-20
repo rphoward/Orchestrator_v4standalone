@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from orchestrator_v4.core.entities.agent_roster_helpers import (
     agent_entry_for_id,
     count_user_chat,
@@ -18,11 +20,17 @@ from orchestrator_v4.core.entities.pierce_holt_engine import get_tone_directive
 from orchestrator_v4.core.entities.stage_evaluator import (
     earliest_unfinished_stage,
     evaluate_stage_completion,
+    merge_stage_completion_verdict_into_flags,
 )
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
+from orchestrator_v4.core.ports.interview_stage_completion_judge import (
+    InterviewStageCompletionJudge,
+)
 
 MANUAL_ROUTING_REASON = "Manual override"
+
+_LOG = logging.getLogger(__name__)
 
 
 class ConductManualInterviewTurn:
@@ -30,9 +38,11 @@ class ConductManualInterviewTurn:
         self,
         turn_store: InterviewSessionTurnStore,
         llm_gateway: InterviewLlmGateway,
+        stage_completion_judge: InterviewStageCompletionJudge,
     ) -> None:
         self._turn_store = turn_store
         self._llm_gateway = llm_gateway
+        self._stage_completion_judge = stage_completion_judge
 
     def execute(
         self, session_id: int, agent_id: int, user_input: str
@@ -155,11 +165,35 @@ class ConductManualInterviewTurn:
             )
         )
 
-        new_flags = evaluate_stage_completion(
-            agent_id,
-            tuple(messages_full),
-            ctx.stage_flags(),
-        )
+        # Stage-completion decision. Agent 5 (synthesizer) is manual-only and
+        # is NOT a stage — its turns must never flip a stage flag. For agents
+        # 1..4, the judge is authoritative; heuristic is the fallback. See
+        # .cursor/plans/stage-completion-judge_*.plan.md slice 10.
+        if agent_id == 5:
+            new_flags = dict(ctx.stage_flags())
+        else:
+            try:
+                verdict = self._stage_completion_judge.judge_stage_completion(
+                    stage_id=agent_id,
+                    messages=tuple(messages_full),
+                    stage_flags_before=ctx.stage_flags(),
+                )
+                if verdict.reason.startswith("judge_error:"):
+                    new_flags = evaluate_stage_completion(
+                        agent_id, tuple(messages_full), ctx.stage_flags()
+                    )
+                else:
+                    new_flags = merge_stage_completion_verdict_into_flags(
+                        verdict, ctx.stage_flags()
+                    )
+            except Exception:
+                _LOG.warning(
+                    "stage_completion_judge raised; falling back to heuristic",
+                    exc_info=True,
+                )
+                new_flags = evaluate_stage_completion(
+                    agent_id, tuple(messages_full), ctx.stage_flags()
+                )
 
         # session.current_agent_id holds the active stage pointer (earliest
         # unfinished stage 1..4). A manual turn can still flip the targeted

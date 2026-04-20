@@ -16,6 +16,10 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from orchestrator_v4.core.entities.interview_turn import RoutingDecision, TurnConversationLine
+from orchestrator_v4.core.entities.stage_completion_verdict import (
+    STAGE_COMPLETION_CONFIDENCE_THRESHOLD,
+    StageCompletionVerdict,
+)
 
 
 def earliest_unfinished_stage(stage_flags: Mapping[int, bool]) -> int:
@@ -69,6 +73,10 @@ def evaluate_stage_completion(
     """
     User chat message count heuristic per stage (>= 2 user messages for active agent).
     Returns updated flags for stages 1–4 merged with prior_flags.
+
+    Kept as the offline / fallback decision when the `InterviewStageCompletionJudge`
+    port returns a ``judge_error:`` verdict or raises. Replaced in the happy path
+    by ``merge_stage_completion_verdict_into_flags``.
     """
     flags = {k: bool(prior_flags.get(k, False)) for k in (1, 2, 3, 4)}
     user_msgs = sum(
@@ -87,4 +95,42 @@ def evaluate_stage_completion(
             flags[3] = True
         elif active_agent_id == 4:
             flags[4] = True
+    return flags
+
+
+def merge_stage_completion_verdict_into_flags(
+    verdict: StageCompletionVerdict,
+    prior_flags: Mapping[int, bool],
+) -> dict[int, bool]:
+    """Flip a single stage flag True iff the verdict passes all guardrails.
+
+    This is the junk-defense boundary for the ``InterviewStageCompletionJudge``
+    port. Trust nothing about ``verdict`` beyond its type; validate every field
+    here so a later coder cannot widen the rule by mistake.
+
+    Rules (all must hold to flip a flag):
+    - ``verdict.stage_id`` is in the set ``{1, 2, 3, 4}``. Any other stage_id
+      (5 = synthesizer, 0, negatives, malformed) returns a copy of
+      ``prior_flags`` with no changes.
+    - ``verdict.stage_complete is True``.
+    - ``verdict.confidence >= STAGE_COMPLETION_CONFIDENCE_THRESHOLD``.
+    - the flag at ``verdict.stage_id`` is currently False. True -> False is
+      never allowed; back-drift is the router's job, not the tracker's.
+
+    Returns a new dict with the four stage keys 1..4 (all pulled from
+    ``prior_flags``), never mutates ``prior_flags``.
+    """
+    flags = {k: bool(prior_flags.get(k, False)) for k in (1, 2, 3, 4)}
+
+    stage_id = verdict.stage_id
+    if stage_id not in (1, 2, 3, 4):
+        return flags
+    if not verdict.stage_complete:
+        return flags
+    if verdict.confidence < STAGE_COMPLETION_CONFIDENCE_THRESHOLD:
+        return flags
+    if flags[stage_id]:
+        return flags
+
+    flags[stage_id] = True
     return flags

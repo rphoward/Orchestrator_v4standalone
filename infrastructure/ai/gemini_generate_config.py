@@ -26,6 +26,24 @@ _ROUTER_RESPONSE_SCHEMA = types.Schema(
     required=["agent_id", "workflow_status", "reason"],
 )
 
+_STAGE_COMPLETION_JUDGE_RESPONSE_SCHEMA = types.Schema(
+    type=types.Type.OBJECT,
+    properties={
+        "stage_complete": types.Schema(type=types.Type.BOOLEAN),
+        "confidence": types.Schema(type=types.Type.NUMBER),
+        "reason": types.Schema(type=types.Type.STRING),
+        "evidence_found": types.Schema(
+            type=types.Type.ARRAY,
+            items=types.Schema(type=types.Type.STRING),
+        ),
+        "missing_topics": types.Schema(
+            type=types.Type.ARRAY,
+            items=types.Schema(type=types.Type.STRING),
+        ),
+    },
+    required=["stage_complete", "confidence", "reason"],
+)
+
 
 def resolve_thinking_level_enum(raw: str) -> types.ThinkingLevel | None:
     level = raw.strip().upper()
@@ -64,6 +82,27 @@ def build_router_generate_config() -> types.GenerateContentConfig:
     return types.GenerateContentConfig(
         response_mime_type="application/json",
         response_schema=_ROUTER_RESPONSE_SCHEMA,
+        temperature=ROUTER_GENERATE_TEMPERATURE,
+        thinking_config=types.ThinkingConfig(
+            thinking_level=types.ThinkingLevel.MINIMAL,
+        ),
+    )
+
+
+def build_stage_completion_judge_generate_config(
+    system_instruction: str,
+) -> types.GenerateContentConfig:
+    """Structured-JSON config for the stage-completion judge.
+
+    Matches the router profile (``temperature=0.1``, thinking MINIMAL) so
+    stage-grading latency and cost stay in the same order of magnitude as
+    routing. The system_instruction carries the per-stage completion prompt
+    body loaded by the adapter from ``runtime/prompts/stage_completion/``.
+    """
+    return types.GenerateContentConfig(
+        system_instruction=system_instruction,
+        response_mime_type="application/json",
+        response_schema=_STAGE_COMPLETION_JUDGE_RESPONSE_SCHEMA,
         temperature=ROUTER_GENERATE_TEMPERATURE,
         thinking_config=types.ThinkingConfig(
             thinking_level=types.ThinkingLevel.MINIMAL,

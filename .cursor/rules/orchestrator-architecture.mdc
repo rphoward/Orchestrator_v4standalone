@@ -28,7 +28,7 @@ alwaysApply: true
 
 - **`core/entities/`**: types and invariants; no I/O.
 - **`core/use_cases/`**: one runnable step per feature; calls entities and **port interfaces only**; no I/O.
-- **`core/ports/`**: interfaces only—no SDK or DB code.
+- **`core/ports/`**: typed interfaces only (`Protocol` or `abc.ABC`) — no SDK or DB code. Wire shapes live in `core/entities/`; pure validators at the port boundary keep adapters from widening behavior. See `orchestrator-layer-core.mdc`.
 - **`infrastructure/`**: adapters (SQLite, Gemini, files) that **implement** `core/ports/`.
 - **`presentation/`**: HTTP and static UI—parse input, call use cases, return responses. No heavy product rules in route handlers.
 - **`bootstrap.py`**: **only** composition root—wires real adapters into use cases. May import all layers; nothing in `core/` imports `bootstrap` for domain logic.

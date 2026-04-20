@@ -24,9 +24,13 @@ from orchestrator_v4.core.entities.stage_evaluator import (
     apply_sequential_stage_veto,
     earliest_unfinished_stage,
     evaluate_stage_completion,
+    merge_stage_completion_verdict_into_flags,
 )
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
+from orchestrator_v4.core.ports.interview_stage_completion_judge import (
+    InterviewStageCompletionJudge,
+)
 
 _LOG = logging.getLogger(__name__)
 
@@ -36,9 +40,11 @@ class ConductInterviewTurn:
         self,
         turn_store: InterviewSessionTurnStore,
         llm_gateway: InterviewLlmGateway,
+        stage_completion_judge: InterviewStageCompletionJudge,
     ) -> None:
         self._turn_store = turn_store
         self._llm_gateway = llm_gateway
+        self._stage_completion_judge = stage_completion_judge
 
     def execute(self, session_id: int, user_input: str) -> InterviewTurnResult:
         text = user_input.strip()
@@ -174,11 +180,31 @@ class ConductInterviewTurn:
             )
         )
 
-        new_flags = evaluate_stage_completion(
-            target_agent_id,
-            tuple(messages_full),
-            ctx.stage_flags(),
-        )
+        # Stage-completion decision: judge is authoritative; heuristic is the
+        # fallback when the adapter returns a judge_error verdict or raises.
+        # See .cursor/plans/stage-completion-judge_*.plan.md slice 9.
+        try:
+            verdict = self._stage_completion_judge.judge_stage_completion(
+                stage_id=target_agent_id,
+                messages=tuple(messages_full),
+                stage_flags_before=ctx.stage_flags(),
+            )
+            if verdict.reason.startswith("judge_error:"):
+                new_flags = evaluate_stage_completion(
+                    target_agent_id, tuple(messages_full), ctx.stage_flags()
+                )
+            else:
+                new_flags = merge_stage_completion_verdict_into_flags(
+                    verdict, ctx.stage_flags()
+                )
+        except Exception:
+            _LOG.warning(
+                "stage_completion_judge raised; falling back to heuristic",
+                exc_info=True,
+            )
+            new_flags = evaluate_stage_completion(
+                target_agent_id, tuple(messages_full), ctx.stage_flags()
+            )
 
         # session.current_agent_id holds the active stage pointer (earliest
         # unfinished stage 1..4); recompute it from the new stage flags every

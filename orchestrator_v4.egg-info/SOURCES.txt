@@ -26,6 +26,7 @@ runtime_paths.py
 ./core/entities/model_registry_entry.py
 ./core/entities/pierce_holt_engine.py
 ./core/entities/prompt_template_row.py
+./core/entities/stage_completion_verdict.py
 ./core/entities/stage_evaluator.py
 ./core/ports/__init__.py
 ./core/ports/agent_configuration_store.py
@@ -36,6 +37,7 @@ runtime_paths.py
 ./core/ports/interview_session_initializer.py
 ./core/ports/interview_session_read_port.py
 ./core/ports/interview_session_turn_store.py
+./core/ports/interview_stage_completion_judge.py
 ./core/ports/model_registry_store.py
 ./core/ports/prompt_body_source.py
 ./core/ports/prompt_template_store.py

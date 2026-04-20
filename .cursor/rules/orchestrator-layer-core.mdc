@@ -20,11 +20,15 @@ globs:
 
 ## Subfolders
 
-- **`entities/`**: shapes and rules on those shapes.
+- **`entities/`**: shapes and rules on those shapes. Wire shapes (persisted rows, JSON payloads, structured adapter returns) live here as a `TypedDict` or a frozen `@dataclass` — never inline in a port. Use `TypedDict(..., total=False)` for partial-update payloads.
 - **`use_cases/`**: one user-visible action per module; calls entities and ports only.
-- **`ports/`**: interfaces only.
+- **`ports/`**: typed interfaces only. `Protocol` or `abc.ABC`. Every method names its argument and return types with entity shapes — never `dict[str, Any]` or `**kwargs: Any`.
 
 ## Naming
 
 - Prefer interview-domain words (session, turn, roster).
 - Avoid empty job-title names: `Service`, `Manager`, `Handler`, `Helper`, `Model`, `Item`.
+
+## Junk-defense at the port boundary
+
+When a port returns a value a use case will act on, validate every field in a pure entity function before the use case reads it. A bug in an adapter, a malformed remote response, or a future change to the adapter must not be able to widen behavior. The pure function at the boundary is the contract; the adapter is not trusted.
