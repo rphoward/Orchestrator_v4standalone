@@ -1,0 +1,33 @@
+# Paths here are skipped for Cursor indexing / default codebase context.
+# They are NOT excluded from git, uv, pytest, or the Flask app unless also in .gitignore.
+
+# Virtualenv and Python noise
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+
+# Build outputs
+build/
+dist/
+*.egg
+
+# Local DB (dev)
+runtime/orchestrator.db
+runtime/*.db-wal
+runtime/*.db-shm
+runtime/*.db-journal
+
+# Secrets (open explicitly when needed)
+.env
+.env.*
+
+# Lockfile is huge; omit from index. When debugging pins, open uv.lock or @-mention it.
+uv.lock
+
+# Interview prompt bodies — large; open a file when editing prompts.
+runtime/prompts/

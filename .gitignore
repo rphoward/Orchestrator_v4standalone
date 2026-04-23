@@ -10,5 +10,14 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+# Setuptools / packaging (editable installs, wheels, PyInstaller, etc.)
+*.egg-info/
+build/
+dist/
+*.egg
+
 # Runtime SQLite (local dev data; recreated by app)
 runtime/orchestrator.db
+runtime/*.db-wal
+runtime/*.db-shm
+runtime/*.db-journal

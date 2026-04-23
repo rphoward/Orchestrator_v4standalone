@@ -6,7 +6,7 @@ todos:
     content: "Slice 1: scaffold .cursor/rules/global/ and .cursor/rules/local/ with READMEs"
     status: pending
   - id: slice-2
-    content: "Slice 2: write .cursor/rules/local/project-vocabulary.mdc (alwaysApply=true)"
+    content: "Slice 2: write local/project-vocabulary.mdc — ubiquitous language = domain terms + architecture vocabulary (port, adapter, use case, entity, layers); see body YAML"
     status: pending
   - id: slice-3
     content: "Slice 3: move orchestrator-architecture.mdc -> global/architecture-layers.mdc and strip nouns"
@@ -39,7 +39,7 @@ todos:
     content: "Slice 12: delete the eight legacy .cursor/rules/orchestrator-*.mdc files"
     status: pending
   - id: slice-13
-    content: "Slice 13: update AGENTS.md section 2 and any plan references to the new rule paths"
+    content: "Slice 13: update AGENTS.md §2 (rule paths); §1 voice line — domain + architecture vocabulary first-class; link local/project-vocabulary.mdc"
     status: pending
   - id: slice-14
     content: "Slice 14: verify each moved file's globs frontmatter still attaches by reading the Cursor rule panel on a matching file"
@@ -82,7 +82,7 @@ Non-goal: changing application code. Codebase keeps its screaming names. Only th
     logging-convention.mdc           # NEW — one INFO per adapter call, identity + outcome
     README.md                        # how the global/local split works; portability notes
   local/
-    project-vocabulary.mdc           # THIS project: package, framework, nouns, adapter stack
+    project-vocabulary.mdc           # THIS project: package, framework, ubiquitous language (domain + architecture), adapter stack
     screaming-rename-table.mdc       # THIS project: sessions.js -> interview_sessions_panel.js table
     README.md                        # points at global/ and names this project
 ```
@@ -97,13 +97,22 @@ description: Project vocabulary — edited per project; referenced by all global
 alwaysApply: true
 ---
 
+## Ubiquitous language scope (read first)
+- One sentence: ubiquitous language for this repo includes both (a) product/domain words used in UI and transcripts and (b) the structural vocabulary we commit to in code and rules (Clean Architecture / ports-and-adapters). Words like port, adapter, use case, and layer folder names are first-class — do not paraphrase them into vague synonyms ("the interface thing") in plans or rules.
+- Non-goal: this file does not teach Clean Architecture; it only licenses the vocabulary so agents use it confidently.
+
+## Architecture vocabulary (first-class; not "meta-jargon")
+- Layers and composition: core, infrastructure, presentation, bootstrap (composition root; this repo uses bootstrap.py).
+- Roles: port, adapter, gateway (if used for outbound ports), use case / use_case, entity, value object (only if the codebase uses it).
+- Shapes: vertical slice, horizontal layer, Protocol (typed port in Python).
+
 ## Package
 - Python package: `orchestrator_v4`
 
 ## Presentation framework
 - Flask + static JS modules
 
-## Domain nouns (screaming-architecture vocabulary)
+## Domain / product nouns (screaming UI + transcripts)
 - primary: interview, session, turn, agent roster, prompt, model registry
 - verbs: route, finalize, export, initialize
 
@@ -113,7 +122,7 @@ alwaysApply: true
 - local filesystem for prompt bodies
 ```
 
-Every global rule that needs a project-specific noun says "the project package" / "the project vocabulary" / "the project adapter stack" and points at this file.
+Every global rule that needs a project-specific noun says "the project package" / "the project vocabulary" / "the project adapter stack" and points at this file. When a global rule points at vocabulary for wording, say **vocabulary from `local/project-vocabulary.mdc` (domain + architecture)** — not "domain nouns only," which would contradict the scope block above.
 
 ## Data-flow sketch (how rules reference each other)
 
@@ -148,22 +157,22 @@ flowchart LR
 
 ### Slice 1 — scaffold folders + READMEs
 New files:
-- `.cursor/rules/global/README.md` — "portable rule kernel; do not put project-specific nouns here. Companion per-project specifics live under `../local/`. To port: copy this whole folder into a new project of similar shape and write a new `local/` set there."
+- `.cursor/rules/global/README.md` — "portable rule kernel; do not put project-specific nouns here. Companion per-project specifics live under `../local/`. To port: copy this whole folder into a new project of similar shape and write a new `local/` set there." Optional closing line: "`local/project-vocabulary.mdc` may list both product language and approved structural terms; `global/` stays free of *this project's* names — not free of generic pattern words like port or core."
 - `.cursor/rules/local/README.md` — "this project's answers to the questions global rules assume. Edit these first in a new project."
 
 ### Slice 2 — extract the vocabulary file
-New: `.cursor/rules/local/project-vocabulary.mdc` with `alwaysApply: true` frontmatter and the content shown in "The one swap-out file" above.
+New: `.cursor/rules/local/project-vocabulary.mdc` with `alwaysApply: true` frontmatter and the content shown in "The one swap-out file" above (scope block + architecture vocabulary list must ship in this slice, not later).
 
 ### Slice 3 — move + neutralize architecture-layers
 - Move `.cursor/rules/orchestrator-architecture.mdc` -> `.cursor/rules/global/architecture-layers.mdc`.
 - Title "Orchestrator v4 — architecture (standalone repo)" -> "Clean architecture — layer map".
 - Line 20 `orchestrator_v4` reference -> "the project package (see `local/project-vocabulary.mdc`)".
 - Line 32 "(SQLite, Gemini, files)" -> "(the project adapter stack)".
-- Example domain words -> "domain nouns from `local/project-vocabulary.mdc`".
+- Example product words -> "vocabulary from `local/project-vocabulary.mdc` (domain + architecture)".
 
 ### Slice 4 — move + neutralize layer-core
 - Move -> `.cursor/rules/global/layer-core.mdc`.
-- "interview-domain words (session, turn, roster)" -> "domain nouns from `local/project-vocabulary.mdc`".
+- "interview-domain words (session, turn, roster)" -> "vocabulary from `local/project-vocabulary.mdc` (domain + architecture)".
 - Keep the typed-ports + junk-defense additions verbatim.
 
 ### Slice 5 — move + neutralize layer-infrastructure
@@ -185,7 +194,7 @@ New: `.cursor/rules/local/project-vocabulary.mdc` with `alwaysApply: true` front
 
 ### Slice 8 — safety / conduct / doc-style
 - `safety.mdc`: move unchanged -> `.cursor/rules/global/safety.mdc`.
-- `conduct.mdc`: move, strip the `(session, turn, agent roster, interview)` line in "Words" to "Use vocabulary from `local/project-vocabulary.mdc`" -> `.cursor/rules/global/conduct.mdc`.
+- `conduct.mdc`: move, strip the `(session, turn, agent roster, interview)` line in "Words" to "Use vocabulary from `local/project-vocabulary.mdc` (domain + architecture)" -> `.cursor/rules/global/conduct.mdc`.
 - `doc-style.mdc`: move, replace specific examples (`#welcomeSection`, "welcome screen", `Acme Corp`, temperature-clamp) with two domain-free placeholders like `#primaryActionButton` / "main screen" -> `.cursor/rules/global/doc-style.mdc`.
 
 ### Slice 9 — new global rule: plan-slice-shape
@@ -221,6 +230,7 @@ After the new set is in place and the two verification steps below pass, delete:
 ### Slice 13 — update external references to renamed rule files
 Files known to reference the old names:
 - [AGENTS.md](AGENTS.md) section 2 (the "Where instructions live" table).
+- [AGENTS.md](AGENTS.md) section 1 (voice): extend "Use words already in the codebase" with a half-sentence that **domain terms and layer/port vocabulary both count**, with a link to `.cursor/rules/local/project-vocabulary.mdc` once that path exists.
 - [DEV-STANDALONE.md](DEV-STANDALONE.md) — none found today, but grep before finalizing.
 - Any `.cursor/plans/*.plan.md` that named a rule file by path.
 
@@ -234,6 +244,8 @@ Each moved rule keeps its existing frontmatter `globs:` (`core/**`, `infrastruct
 1. Copy `.cursor/rules/global/` into a scratch folder.
 2. Run: `grep -ri -E "orchestrator|interview|session|gemini|sqlite|flask" .cursor/rules/global/` — expect zero hits.
 3. Any hit is a failure; add one more neutralization pass on that file.
+
+**Note:** Hits for generic pattern words (`port`, `core`, `adapter`, `use case`) under `global/` are not failures — the ban is on *this project's* names and product stack, not on structural vocabulary. `local/project-vocabulary.mdc` explicitly lists architecture terms so agents do not treat them as out-of-bounds.
 
 ## Optional follow-ups (out of scope here)
 
