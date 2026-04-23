@@ -2,7 +2,7 @@
  * Interview UI press feedback — optional short click sounds for primary controls.
  * Cross-cutting Settings chrome (localStorage + Web Audio); not session/agent domain logic.
  * Wired from app bootstrap so the checkbox is bound even if Settings is never opened.
- * See `.cursor/rules/orchestrator-screaming-presentation.mdc`.
+ * See `.cursor/rules/orchestrator-presentation.mdc`.
  */
 
 const LOCAL_STORAGE_KEY = 'orchestrator_v4_ui_sounds_enabled';

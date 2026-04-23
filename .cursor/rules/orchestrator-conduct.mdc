@@ -1,12 +1,17 @@
 ---
-description: Light workflow — plan multi-step work, use editor tools over blind shell, short summaries.
+description: Workflow and coding behavior — plan multi-step work, settle names early, make small verified changes.
 alwaysApply: true
 ---
 
 # Workspace conduct
 
 - **Multi-step work:** Sketch steps before large edits or many commands.
+- **Naming:** When a task adds or renames files, settle the names in the plan first. Use repo words that say what the product and layer do out loud; do not reopen a clear naming choice during implementation.
+- **Ambiguity:** If the request has more than one reading that changes scope, code path, or risk, say so and state your default.
 - **Tools:** Prefer search / read-file / repo navigation over guessing paths in the shell.
+- **Simplicity:** Use the minimum code or doc change that solves the request. No speculative flexibility.
+- **Surgical changes:** Touch only what the request requires. Remove only the imports, helpers, or files your own change made obsolete.
+- **Verification:** Before you call work done, say what check proves it, run that check, and report what changed or ran.
 - **Post-change summary:** One short note of what you changed or ran.
 - **Words:** Use vocabulary already in this repo (session, turn, agent roster, interview). See `AGENTS.md` section 1 for tone.
 - **Docs:** Update `.cursor/plans/` or `DEV-STANDALONE.md` when you intentionally change behavior they describe—skip cosmetic-only doc churn.

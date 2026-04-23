@@ -4,15 +4,15 @@
 
 - **What this is:** Flask interview orchestration (sessions, turns, agent roster, Gemini routing) using **Clean Architecture** at the repo root: `core/`, `infrastructure/`, `presentation/`, `bootstrap.py`. Python package name: **`orchestrator_v4`** (`pyproject.toml`).
 - **Slices:** **Horizontal** = those layers (fixed dependency direction). **Vertical** = one feature cutting through layers (use case + port + adapter + HTTP)—must keep horizontal boundaries clean. Full map: **`.cursor/rules/orchestrator-architecture.mdc`** (always loaded).
-- **Voice:** Plain English, workshop tone. Push back on real risks (secrets, data loss, scope). Use words already in the codebase.
+- **Voice:** Plain English, workshop tone. Push back on real risks (secrets, data loss, scope). Use words already in the codebase; domain words and layer words both count.
 - **Runbooks:** [`DEV-STANDALONE.md`](DEV-STANDALONE.md) for env, SQLite, ports, verification checklist.
 
 ## 2. Where instructions live
 
 | Kind | Location |
 |------|-----------|
-| **Architecture + layers** | `.cursor/rules/orchestrator-architecture.mdc` + `orchestrator-layer-*.mdc` |
-| **Presentation naming (“screaming”)** | `.cursor/rules/orchestrator-screaming-presentation.mdc` (when editing `presentation/`) |
+| **Architecture + naming principle** | `.cursor/rules/orchestrator-architecture.mdc` |
+| **Layer rules** | `orchestrator-layer-core.mdc`, `orchestrator-layer-infrastructure.mdc`, `orchestrator-presentation.mdc` |
 | **Conduct + safety** | `orchestrator-conduct.mdc`, `orchestrator-safety.mdc` |
 | **This file** | Short contract—no long architecture prose here |
 | **Operations** | `DEV-STANDALONE.md` |

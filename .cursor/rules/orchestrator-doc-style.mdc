@@ -4,7 +4,6 @@ globs:
   - README.md
   - DEV-STANDALONE.md
   - .cursor/plans/**
-  - .cursor/rules/orchestrator-screaming-presentation.mdc
 ---
 
 # Documentation style (human-facing)

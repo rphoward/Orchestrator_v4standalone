@@ -1,7 +1,7 @@
 /**
  * Cross-cutting interview UI shell — not a feature module.
  * Owns: toast bar, status bar, confirm modal — DOM chrome only, no interview rules.
- * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
+ * See `.cursor/rules/orchestrator-presentation.mdc` for naming policy.
  */
 
 import { ERROR_HINTS, escapeHtml } from './utils.js';

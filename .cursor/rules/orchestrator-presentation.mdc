@@ -1,0 +1,32 @@
+---
+description: presentation/ — thin HTTP and static UI glue with interview-domain names.
+globs:
+  - presentation/**
+---
+
+# `presentation/`
+
+**Thin handlers:** parse request → call use case → return response. Keep product rules in `core/` when they do not need HTTP or browser details.
+
+## Flow
+
+- Use **`from orchestrator_v4 import bootstrap`**, read wired use cases from `bootstrap`, and call them from routes.
+- Do **not** construct SQLite stores or Gemini clients inside route files.
+
+## Allowed
+
+- Flask, templates, static files, and small HTTP helpers.
+
+## Forbidden
+
+- **`orchestrator_v4.infrastructure`** imports in route or browser-facing modules.
+- Heavy `if` chains for product rules in views or front-end code.
+- Direct `core.entities` imports in routes when the use case can return plain data instead.
+
+## Naming
+
+- Routes, templates, and JS modules should sound like **interview orchestration**, not a generic web app.
+- Prefer names like `interview_session_routes`, `interview_chat_panel`, `interview_model_registry_panel`, and other names that say the feature out loud.
+- Do **not** add top-level `helpers.py`, `utils.py`, or `misc_routes.py`; use a name that says what interview behavior the file owns.
+- `api.js`, `ui.js`, `state.js`, and `utils.js` may keep short names as cross-cutting interview UI shell files, but keep the short header comment that says what shell code they own.
+- When you rename a presentation feature module, update `presentation/static/app.js` and `presentation/static/index.html` in the same change.

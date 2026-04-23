@@ -1,6 +1,6 @@
 # Personal Instructions for Claude
 
-Long-form companion to [`karpathyrulesforcursor.mdc`](./karpathyrulesforcursor.mdc) (always-on summary). @-mention this file when you need the full hierarchy, publication rules, or documentation atomic structure.
+Long-form companion to [`orchestrator-conduct.mdc`](../.cursor/rules/orchestrator-conduct.mdc). @-mention this file when you need the full hierarchy, publication rules, or documentation atomic structure.
 
 ## Style Application Hierarchy
 

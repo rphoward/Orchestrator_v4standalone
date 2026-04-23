@@ -5,15 +5,15 @@ alwaysApply: true
 
 # Orchestrator v4 — architecture (standalone repo)
 
-## Horizontal vs vertical (read this first)
+## Horizontal vs vertical
 
 - **Horizontal slices** = **layers** at repo root: `core/`, `infrastructure/`, `presentation/`, plus `bootstrap.py`. The dependency rule is fixed: **outer layers may depend on `core/`; `core/` never depends on outer layers.** Same rule after any feature work: a vertical slice must not blur these boundaries.
 - **Vertical slices** = **one user-facing capability** implemented **through** the stack (e.g. new use case + port + adapter + route). Vertical work should **tighten** horizontal separation (smaller handlers, clearer ports)—not bypass it with shortcuts (routes calling DB, entities doing HTTP, etc.).
 
 ## Naming (screaming)
 
-- **Same idea as use cases:** pick words a maintainer would say out loud about this product—**interview**, **session**, **turn**, **agent roster**, **prompt**, **model registry**—not `Service`, `Helper`, `utils2`.
-- **`presentation/` detail:** routes and static JS should follow that vocabulary too. Checklist and rename hints: **`.cursor/rules/orchestrator-screaming-presentation.mdc`** (loads when you work under `presentation/`).
+- **Whole repo rule:** file names, class names, functions, ports, adapters, routes, and modules should say what this product does out loud: **interview**, **session**, **turn**, **agent roster**, **prompt**, **model registry**, **port**, **adapter**, **bootstrap**.
+- Avoid empty names like `Service`, `Manager`, `Helper`, `Controller`, `Gateway`, `Repository`, or `utils2` unless the name is truly the clearest local fit.
 
 ## Where code lives
 
@@ -28,7 +28,7 @@ alwaysApply: true
 
 - **`core/entities/`**: types and invariants; no I/O.
 - **`core/use_cases/`**: one runnable step per feature; calls entities and **port interfaces only**; no I/O.
-- **`core/ports/`**: typed interfaces only (`Protocol` or `abc.ABC`) — no SDK or DB code. Wire shapes live in `core/entities/`; pure validators at the port boundary keep adapters from widening behavior. See `orchestrator-layer-core.mdc`.
+- **`core/ports/`**: typed interfaces only (`Protocol` or `abc.ABC`) — no SDK or DB code. Wire shapes live in `core/entities/`; pure validators at the port boundary keep adapters from widening behavior.
 - **`infrastructure/`**: adapters (SQLite, Gemini, files) that **implement** `core/ports/`.
 - **`presentation/`**: HTTP and static UI—parse input, call use cases, return responses. No heavy product rules in route handlers.
 - **`bootstrap.py`**: **only** composition root—wires real adapters into use cases. May import all layers; nothing in `core/` imports `bootstrap` for domain logic.
@@ -36,7 +36,7 @@ alwaysApply: true
 ## Avoid
 
 - One giant I/O file for everything; huge use cases—split or move logic to entities.
-- Vague names: `Service`, `Manager`, `Helper`, `Controller` when the name could mean anything.
+- Re-litigating clear naming during implementation when the plan already settled it.
 
 ## New external capability (API, DB, disk)
 

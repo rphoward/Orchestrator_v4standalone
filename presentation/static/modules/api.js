@@ -1,7 +1,7 @@
 /**
  * Cross-cutting interview UI shell — not a feature module.
  * Owns: typed `fetch` wrapper (`api`) and `loadModels()` bootstrap for the registry.
- * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
+ * See `.cursor/rules/orchestrator-presentation.mdc` for naming policy.
  */
 
 import { showError }       from './ui.js';

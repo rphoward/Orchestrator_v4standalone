@@ -4,7 +4,7 @@
  * pointers) plus the active stage pointer mirror that the chat panel and
  * session panel both read.
  * Mutations go through setters so call sites are easy to grep.
- * See `.cursor/rules/orchestrator-screaming-presentation.mdc` for naming policy.
+ * See `.cursor/rules/orchestrator-presentation.mdc` for naming policy.
  */
 
 // Routing mode: true when auto-routing is on (router picks the agent),

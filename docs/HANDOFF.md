@@ -56,21 +56,20 @@ All under `.cursor/rules/`. **`alwaysApply: true`** on architecture, conduct, sa
 
 | File | Role |
 |------|------|
-| `orchestrator-architecture.mdc` | Layers, import direction, vertical vs horizontal slices, naming pointer |
-| `orchestrator-conduct.mdc` | Light workflow + “informal American English” for rule text |
+| `orchestrator-architecture.mdc` | Layers, import direction, vertical vs horizontal slices, repo-wide naming principle |
+| `orchestrator-conduct.mdc` | Workflow + coding behavior, including planning names before file adds or renames |
 | `orchestrator-safety.mdc` | Deletes, scope, secrets, no drive-by refactors |
 | `orchestrator-layer-core.mdc` | `core/**` — no I/O, no outer imports |
 | `orchestrator-layer-infrastructure.mdc` | `infrastructure/**` — adapters only |
-| `orchestrator-layer-presentation.mdc` | `presentation/**` — thin HTTP/JS glue |
-| `orchestrator-doc-style.mdc` | Plain-language style for README, DEV-STANDALONE, plans, screaming rule |
-| `orchestrator-screaming-presentation.mdc` | “Screaming” names in `presentation/` — domain vocabulary, JS rename map, cross-cutting shell headers |
+| `orchestrator-presentation.mdc` | `presentation/**` — thin HTTP/JS glue plus local naming examples |
+| `orchestrator-doc-style.mdc` | Plain-language style for README, DEV-STANDALONE, and plans |
 
 ---
 
 ## 7. Screaming architecture / UI
 
-- **Idea:** Names should shout **interview orchestration**, not “generic web app.” We **kept** horizontal layers; we fix naming **inside** `presentation/`, especially `presentation/static/modules/`.
-- **Rule of thumb:** Rename JS modules **when you touch that feature**; update `presentation/static/app.js` and `presentation/static/index.html` in the same change. Full rename table lives in **`orchestrator-screaming-presentation.mdc`**.
+- **Idea:** Names should shout **interview orchestration**, not “generic web app.” The naming principle is now **repo-wide** in `orchestrator-architecture.mdc`; `orchestrator-presentation.mdc` just gives local `presentation/` examples.
+- **Rule of thumb:** Settle file names in the **plan** when a task adds or renames files. During implementation, rename JS modules **when you touch that feature** and update `presentation/static/app.js` and `presentation/static/index.html` in the same change.
 - **Cross-cutting shell:** `api.js`, `ui.js`, `state.js`, `utils.js` may keep short names but carry a **short header** stating they are shared shell, not feature modules.
 
 ---
