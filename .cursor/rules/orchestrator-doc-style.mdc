@@ -3,6 +3,7 @@ description: Plain-language style for human-facing docs and checklists.
 globs:
   - README.md
   - DEV-STANDALONE.md
+  - docs/**/*.md
   - .cursor/plans/**
 ---
 
@@ -17,22 +18,24 @@ When editing or creating documents meant to be read by humans (not machines or o
 
 ## Style rules
 
-- **Describe actions as steps**: say **“What to do”** and **“What you should see”** instead of only naming functions or states.
-- **Avoid unexplained jargon**: if you must use a term like “loader”, “toast”, or “workspace”, either:
-  - Replace it with plainer wording (e.g. “short loading message”, “error bar at the bottom”), or
+- **Describe actions as steps**: say **"What to do"** and **"What you should see"** instead of only naming functions or states.
+- **Avoid unexplained jargon**: if you must use a term like "loader", "toast", or "workspace", either:
+  - Replace it with plainer wording (e.g. "short loading message", "error bar at the bottom"), or
   - Explain it the first time in that document.
 - **Prefer UI words over code words**:
-  - Say “welcome screen”, “main interview screen”, “session list in the left sidebar” instead of `#welcomeSection`, `#mainContent`, `#sessionList`.
+  - Say "welcome screen", "main interview screen", "session list in the left sidebar" instead of `#welcomeSection`, `#mainContent`, `#sessionList`.
   - Reserve ids / class names / function names for the **Primary files** / developer notes part of a doc.
 - **Concrete examples beat abstractions**:
-  - Use realistic values (e.g. “type `Acme Corp` as the client name”, “set temperature to `3` and expect it to clamp to `2`”) instead of abstract descriptions.
+  - Use realistic values (e.g. "type `Acme Corp` as the client name", "set temperature to `3` and expect it to clamp to `2`") instead of abstract descriptions.
+- **Atomic sections**: one main idea per heading. Don't bundle unrelated concepts under one heading.
+- **Tutorial shape for README and getting-started docs**: prefer a **numbered try-this flow** (do this → you should see this) over abstract capability lists. Keep deep architecture and API contracts in DEV-STANDALONE or linked docs, not in the first-page tutorial.
 
 ## Checklists and acceptance criteria
 
 - Manual test rows should read naturally to a person running them in the browser:
   - One column that says **what to do**.
   - One column that says **what should happen** on screen.
-- Only include internal names (ids, function names, file paths) in a dedicated “Primary files” / “For developers” column or section.
+- Only include internal names (ids, function names, file paths) in a dedicated "Primary files" / "For developers" column or section.
 
 ## When in doubt
 

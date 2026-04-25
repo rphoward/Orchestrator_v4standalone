@@ -38,7 +38,8 @@ This repo is **Orchestrator v4** as a **standalone** Flask app: interview sessio
 
 | File | Use |
 |------|-----|
-| [README.md](../README.md) | GitHub-facing quick start, link hub |
+| [README.md](../README.md) | GitHub-facing quick start, "Using the application" strip, link hub |
+| [USER-GUIDE.md](USER-GUIDE.md) | Hands-on operator walkthrough — sessions, routing, stage tracking, settings |
 | [DEV-STANDALONE.md](../DEV-STANDALONE.md) | Deep runbook: env, SQLite, ports, verification checklist, post-migration honesty |
 | [DEBUG_INTERVIEW_CHAT.md](DEBUG_INTERVIEW_CHAT.md) | Paste into a fresh chat: stub vs echo vs routing, what shipped, env, files, logs to capture |
 | [AGENTS.md](../AGENTS.md) | Short agent/human contract + where rules live |

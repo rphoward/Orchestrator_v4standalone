@@ -19,7 +19,7 @@
 | Echo (live Gemini) | `gemini_interview_llm_gateway.py`: prefer stitched **non-thought `Part`** text over `response.text` when parts exist |
 | Thoughts-only | Same file: raise if `include_thoughts` and only thought parts |
 | Router JSON | `gemini_generate_config.py`: **`response_schema`** `{agent_id, workflow_status, reason}` + `application/json` |
-| Auto-Route UI | `chat.js`/`sessions.js`: hide manual row when auto on; **`syncActiveThreadToSessionCurrentAgent`** when toggling auto on; `index.html` **`app.js?v=21`** |
+| Auto-Route UI | `presentation/static/modules/interview_chat_panel.js` / `interview_sessions_panel.js`: hide manual picker when auto on; snap thread to active stage pointer when toggling auto on |
 
 ## Env (must-have for live API)
 

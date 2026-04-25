@@ -16,6 +16,7 @@
 | **Conduct + safety** | `orchestrator-conduct.mdc`, `orchestrator-safety.mdc` |
 | **This file** | Short contract—no long architecture prose here |
 | **Operations** | `DEV-STANDALONE.md` |
+| **Operator UI walkthrough** | `docs/USER-GUIDE.md` |
 
 ## 3. Commands (repository root)
 

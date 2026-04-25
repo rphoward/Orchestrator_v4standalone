@@ -103,6 +103,8 @@ Leave the two **`ORCHESTRATOR_*_MODEL`** vars unset to use **Settings** and the 
 
 **Export / final report refresh (pre-existing, not the observability GET above):** **`GET /api/sessions/<id>/export`**, **read-bundle**, and **finalize** still go through the report refresh use case, which *may* call the semantic judge before reading — do not confuse that with the debug `stage-tracking` endpoint.
 
+**Operator overview:** if you just want a click-by-click tour of the UI (sessions, routing, stage badge, Settings → Stage Tracking, debug panel), see **[docs/USER-GUIDE.md](docs/USER-GUIDE.md)**.
+
 ---
 
 ## SQLite DB hygiene (`runtime/orchestrator.db`)
@@ -152,6 +154,9 @@ Re-run this list after **migrations, merges, or GitHub history changes** until y
 6. Change router model in Settings → next routing uses updated model (no restart), unless **`ORCHESTRATOR_ROUTER_MODEL`** overrides in env.
 7. **Settings → Model Registry → Check names with Google** finishes without a key/network error (optional but good after editing model IDs).
 8. (Optional) **`pip install -e .`** then **`python -c "import orchestrator_v4.presentation.app"`** succeeds.
+9. Open a session, send one message → the **Stage: N** badge and stage dots appear in the header.
+10. Open **Settings → Agent Settings** → scroll to **Stage Tracking** card → change mode to **Semantic**, save → confirmation line updates → change back to **Hybrid**, save.
+11. Expand **📡 Routing Intelligence Log** → expand **Stage tracking (debug)** inside it → the panel shows the last turn's mode, gate reason, and stage flags.
 
 ---
 
