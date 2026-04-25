@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -57,6 +58,8 @@ class TurnContext:
     routing_logs: tuple[TurnRoutingLogLine, ...]
     agents: tuple[InterviewTurnAgentRosterEntry, ...]
     stage_progress_json: str = ""
+    # Capped JSON array: per-turn stage tracking observations
+    stage_tracking_log_json: str = ""
 
     def stage_flags(self) -> dict[int, bool]:
         return {
@@ -116,6 +119,8 @@ class InterviewTurnResult:
     psychological_phase: str
     session_renamed: str | None
     active_stage_pointer: int = 0
+    """Latest turn stage tracking observation (read-only, safe for UI)."""
+    stage_tracking: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -128,3 +133,4 @@ class ManualInterviewTurnResult:
     routing_reason: str = "Manual override"
     session_renamed: str | None = None
     active_stage_pointer: int = 0
+    stage_tracking: dict[str, Any] = field(default_factory=dict)

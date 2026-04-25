@@ -1,5 +1,6 @@
 """Use-case tests for backend stage tracking modes."""
 
+import json
 from collections.abc import Mapping, Sequence
 
 from orchestrator_v4.core.entities.interview_turn import (
@@ -22,6 +23,9 @@ from orchestrator_v4.core.use_cases.conduct_manual_interview_turn import (
 )
 from orchestrator_v4.core.use_cases.load_interview_session_for_export import (
     LoadInterviewSessionForExport,
+)
+from orchestrator_v4.core.use_cases.read_session_stage_tracking_log import (
+    ReadSessionStageTrackingLog,
 )
 from orchestrator_v4.core.use_cases.refresh_stage_tracking_before_report import (
     RefreshStageTrackingBeforeReport,
@@ -70,11 +74,13 @@ class InMemoryTurnStore:
         messages: tuple[TurnConversationLine, ...] = (),
         current_agent_id: int = 1,
         stage_progress_json: str = "",
+        stage_tracking_log_json: str = "[]",
     ) -> None:
         self.messages = list(messages)
         self.current_agent_id = current_agent_id
         self.stage_flags = {1: False, 2: False, 3: False, 4: False}
         self.stage_progress_json = stage_progress_json
+        self.stage_tracking_log_json = stage_tracking_log_json
         self.routing_logs: list[RoutingLogAppend] = []
 
     def load_turn_context(self, session_id: int) -> TurnContext:
@@ -87,6 +93,7 @@ class InMemoryTurnStore:
             stage3_complete=self.stage_flags[3],
             stage4_complete=self.stage_flags[4],
             stage_progress_json=self.stage_progress_json,
+            stage_tracking_log_json=self.stage_tracking_log_json,
             messages=tuple(self.messages),
             routing_logs=(),
             agents=_agents(),
@@ -111,6 +118,7 @@ class InMemoryTurnStore:
         stage_flags: dict[int, bool] | None = None,
         name: str | None = None,
         stage_progress_json: str | None = None,
+        stage_tracking_log_json: str | None = None,
     ) -> None:
         if current_agent_id is not None:
             self.current_agent_id = current_agent_id
@@ -118,6 +126,8 @@ class InMemoryTurnStore:
             self.stage_flags.update(stage_flags)
         if stage_progress_json is not None:
             self.stage_progress_json = stage_progress_json
+        if stage_tracking_log_json is not None:
+            self.stage_tracking_log_json = stage_tracking_log_json
 
 
 class FakeLlmGateway:
@@ -183,11 +193,18 @@ def test_auto_hybrid_early_turn_skips_judge() -> None:
         FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
     )
 
-    use_case.execute(1, "The first useful brand note is mostly about trust.")
+    result = use_case.execute(1, "The first useful brand note is mostly about trust.")
 
     assert judge.calls == []
     assert read_stage_progress(store.stage_progress_json, 1).user_message_count == 1
     assert store.stage_flags[1] is False
+    assert result.stage_tracking.get("turn_endpoint") == "auto"
+    assert result.stage_tracking.get("judge_ran") is False
+    assert result.stage_tracking.get("gate_reason") in (
+        "fewer_than_two_user_messages",
+        "no_meaningful_evidence",
+    )
+    assert "evaluated_progress" in result.stage_tracking
 
 
 def test_manual_hybrid_turn_writes_progress_for_selected_agent() -> None:
@@ -200,10 +217,12 @@ def test_manual_hybrid_turn_writes_progress_for_selected_agent() -> None:
         FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
     )
 
-    use_case.execute(1, 2, "The founder keeps insisting that specificity matters.")
+    r = use_case.execute(1, 2, "The founder keeps insisting that specificity matters.")
 
     assert judge.calls == []
     assert read_stage_progress(store.stage_progress_json, 2).user_message_count == 1
+    assert r.stage_tracking.get("turn_endpoint") == "manual"
+    assert r.stage_tracking.get("progress_json_updated") is True
 
 
 def test_semantic_mode_calls_judge_for_eligible_turn() -> None:
@@ -217,9 +236,12 @@ def test_semantic_mode_calls_judge_for_eligible_turn() -> None:
         FakeStageTrackingSettingsStore(StageTrackingSettings("semantic", 4)),
     )
 
-    use_case.execute(1, "ok")
+    r = use_case.execute(1, "ok")
 
     assert judge.calls == [3]
+    assert r.stage_tracking.get("gate_reason") == "semantic_mode"
+    assert r.stage_tracking.get("judge_ran") is True
+    assert r.stage_tracking.get("judge_outcome") == "verdict"
 
 
 def test_manual_agent_five_skips_judge_progress_and_flags() -> None:
@@ -233,11 +255,14 @@ def test_manual_agent_five_skips_judge_progress_and_flags() -> None:
         FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
     )
 
-    use_case.execute(1, 5, "Please synthesize what we have so far.")
+    r = use_case.execute(1, 5, "Please synthesize what we have so far.")
 
     assert judge.calls == []
     assert store.stage_progress_json == ""
     assert store.stage_flags == {1: True, 2: False, 3: False, 4: False}
+    assert r.stage_tracking.get("gate_reason") == "ineligible_agent"
+    assert r.stage_tracking.get("judge_ran") is False
+    assert r.stage_tracking.get("flags_changed") is False
 
 
 def test_compact_progress_alone_cannot_mark_stage_complete() -> None:
@@ -255,11 +280,13 @@ def test_compact_progress_alone_cannot_mark_stage_complete() -> None:
         FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
     )
 
-    use_case.execute(1, "The second evidence point is that teams return after failed agency work.")
+    r2 = use_case.execute(1, "The second evidence point is that teams return after failed agency work.")
 
     assert judge.calls == [1]
     assert read_stage_progress(store.stage_progress_json, 1).candidate_complete is True
     assert store.stage_flags[1] is False
+    assert r2.stage_tracking.get("evaluated_progress", {}).get("summary") == "candidate_complete"
+    assert r2.stage_tracking.get("flags_changed") is False
 
 
 def test_final_report_refresh_calls_judge_only_when_gate_says_yes() -> None:
@@ -396,3 +423,37 @@ def test_load_interview_session_for_export_returns_none_when_refresh_raises() ->
     assert load_uc.execute(99) is None
     assert reader_calls == 0
     assert judge.calls == []
+
+
+def test_read_session_stage_tracking_log_is_read_only() -> None:
+    store = InMemoryTurnStore()
+    judge = RecordingJudge(complete=True, confidence=1.0)
+    use_case = ConductInterviewTurn(
+        store,
+        FakeLlmGateway(target_agent_id=1),
+        judge,
+        FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
+    )
+    use_case.execute(1, "A long enough first user message to pass meaningful input gates.")
+    read_log = ReadSessionStageTrackingLog(store)
+    out = read_log.execute(1)
+    assert "entries" in out
+    assert len(out["entries"]) >= 1
+    # Second call should not add entries (read-only)
+    out2 = read_log.execute(1)
+    assert len(out2["entries"]) == len(out["entries"])
+
+
+def test_conduct_interview_persists_stage_tracking_log() -> None:
+    store = InMemoryTurnStore()
+    judge = RecordingJudge(complete=True, confidence=1.0)
+    use_case = ConductInterviewTurn(
+        store,
+        FakeLlmGateway(target_agent_id=1),
+        judge,
+        FakeStageTrackingSettingsStore(StageTrackingSettings("hybrid", 4)),
+    )
+    use_case.execute(1, "The first useful brand note is mostly about trust.")
+    log = json.loads(store.stage_tracking_log_json)
+    assert len(log) == 1
+    assert log[0].get("turn_endpoint") == "auto"

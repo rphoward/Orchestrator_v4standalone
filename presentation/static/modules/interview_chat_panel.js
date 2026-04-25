@@ -211,6 +211,42 @@ export function displayResponse(result, options = {}) {
 
     const preloaded = options.preloadedMessages;
     showThread(agentId, preloaded !== undefined ? { preloadedMessages: preloaded } : {});
+
+    if (result && result.stage_tracking) {
+        renderStageTrackingPanel(result.stage_tracking);
+    }
+}
+
+/**
+ * Renders the latest `stage_tracking` dict from a turn result or from GET /stage-tracking.
+ * Read-only: does not call export or the judge.
+ */
+function renderStageTrackingPanel(st) {
+    const c = document.getElementById('stageTrackingDebug');
+    if (!c) return;
+    if (!st || typeof st !== 'object') {
+        c.innerHTML = '<p class="text-themeMuted text-[11px] italic">No stage tracking data yet. Send a message to populate.</p>';
+        return;
+    }
+    const after = st.stage_flags_after || {};
+    const v = st.verdict;
+    const ev = st.evaluated_progress || {};
+    const lineMode = `Mode: ${st.stage_tracking_mode} · turn: ${st.turn_endpoint} · agent ${st.routed_stage_id}`;
+    const lineGate = st.judge_ran
+        ? `Gate: ${st.gate_reason} · outcome: ${st.judge_outcome}`
+        : `Gate: ${st.gate_reason} (judge skipped)`;
+    const lineProg = `Progress: ${ev.summary || '—'} · u=${ev.user_message_count} e=${ev.meaningful_evidence_count} t=${ev.turns_since_judge} · JSON updated: ${st.progress_json_updated}`;
+    const lineV = v
+        ? `Verdict: complete=${v.stage_complete} conf=${v.confidence} — ${(v.reason || '').slice(0, 200)}`
+        : '';
+    const fl = [1, 2, 3, 4].map((n) => `${n}=${after[String(n)]}`).join(', ');
+    c.innerHTML = [
+        `<div>${escapeHtml(lineMode)}</div>`,
+        `<div>${escapeHtml(lineGate)}</div>`,
+        `<div>${escapeHtml(lineProg)}</div>`,
+        v ? `<div>${escapeHtml(lineV)}</div>` : '',
+        `<div>Flags: ${escapeHtml(fl)}</div>`,
+    ].filter(Boolean).join('');
 }
 
 export function parseAgentResponse(text) {
@@ -320,6 +356,7 @@ export async function loadRoutingLogs() {
                 ${l.reason ? `<div class="text-themeMuted mt-1 text-xs opacity-80">${escapeHtml(l.reason)}</div>` : ''}
             </div>
         `).join('');
+        await loadStageTrackingDebug();
     } catch (err) {
         console.error('loadRoutingLogs failed:', err);
         const c = document.getElementById('routingLog');
@@ -327,6 +364,22 @@ export async function loadRoutingLogs() {
             c.innerHTML =
                 '<p class="text-red-700 text-sm italic">Could not load routing log. Try again later.</p>';
         }
+    }
+}
+
+/** Read-only: GET persisted snapshots (no LLM, no export refresh). */
+export async function loadStageTrackingDebug() {
+    if (!currentSessionId) return;
+    const c = document.getElementById('stageTrackingDebug');
+    if (!c) return;
+    try {
+        const data = await api(`/api/sessions/${currentSessionId}/stage-tracking`);
+        const arr = data.entries || [];
+        const st = arr.length ? arr[arr.length - 1] : null;
+        renderStageTrackingPanel(st);
+    } catch (err) {
+        console.error('loadStageTrackingDebug failed:', err);
+        c.innerHTML = '<p class="text-red-700 text-[11px]">Could not load stage tracking (debug).</p>';
     }
 }
 

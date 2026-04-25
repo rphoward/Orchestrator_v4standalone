@@ -165,6 +165,16 @@ def register_interview_session_routes(app: Flask) -> None:
         except ValueError:
             return jsonify([])
 
+    @app.route("/api/sessions/<int:session_id>/stage-tracking", methods=["GET"])
+    def get_session_stage_tracking(session_id: int):
+        """Read-only: last N persisted turn snapshots (no judge / no export refresh)."""
+        try:
+            return jsonify(bootstrap.read_session_stage_tracking_log.execute(session_id))
+        except ValueError as e:
+            if "must be positive" in str(e):
+                return value_error_http_response(e)
+            return jsonify({"error": str(e), "error_type": "not_found"}), 404
+
     @app.route("/api/sessions/<int:session_id>/routing-logs", methods=["GET"])
     def get_routing_logs(session_id: int):
         """Return routing log entries for a session."""

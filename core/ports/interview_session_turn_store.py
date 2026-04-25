@@ -30,5 +30,6 @@ class InterviewSessionTurnStore(Protocol):
         stage_flags: dict[int, bool] | None = None,
         name: str | None = None,
         stage_progress_json: str | None = None,
+        stage_tracking_log_json: str | None = None,
     ) -> None:
         ...

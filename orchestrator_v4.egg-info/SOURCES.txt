@@ -29,6 +29,7 @@ runtime_paths.py
 ./core/entities/stage_completion_verdict.py
 ./core/entities/stage_evaluator.py
 ./core/entities/stage_progress.py
+./core/entities/stage_tracking_turn_snapshot.py
 ./core/ports/__init__.py
 ./core/ports/agent_configuration_store.py
 ./core/ports/agent_override_reader.py
@@ -57,6 +58,7 @@ runtime_paths.py
 ./core/use_cases/load_interview_session_routing_logs.py
 ./core/use_cases/prompt_template_catalog.py
 ./core/use_cases/read_agent_overrides.py
+./core/use_cases/read_session_stage_tracking_log.py
 ./core/use_cases/refresh_stage_tracking_before_report.py
 ./core/use_cases/session_export_v3_format.py
 ./core/use_cases/stage_tracking_judge_runner.py
@@ -101,6 +103,7 @@ core/entities/prompt_template_row.py
 core/entities/stage_completion_verdict.py
 core/entities/stage_evaluator.py
 core/entities/stage_progress.py
+core/entities/stage_tracking_turn_snapshot.py
 core/ports/__init__.py
 core/ports/agent_configuration_store.py
 core/ports/agent_override_reader.py
@@ -129,6 +132,7 @@ core/use_cases/load_interview_session_for_export.py
 core/use_cases/load_interview_session_routing_logs.py
 core/use_cases/prompt_template_catalog.py
 core/use_cases/read_agent_overrides.py
+core/use_cases/read_session_stage_tracking_log.py
 core/use_cases/refresh_stage_tracking_before_report.py
 core/use_cases/session_export_v3_format.py
 core/use_cases/stage_tracking_judge_runner.py
@@ -166,4 +170,6 @@ presentation/preflight_frozen.py
 presentation/prompt_template_routes.py
 tests/test_core_entities.py
 tests/test_stage_progress.py
+tests/test_stage_tracking_api_contract.py
+tests/test_stage_tracking_settings_use_cases.py
 tests/test_stage_tracking_turns.py

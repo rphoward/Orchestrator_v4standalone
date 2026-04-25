@@ -37,14 +37,14 @@ def test_update_stage_tracking_settings_normalizes_and_persists() -> None:
     assert store.read() == out
 
 
-def test_update_stage_tracking_settings_invalid_interval_falls_back() -> None:
+def test_update_stage_tracking_settings_low_interval_clamps_to_one() -> None:
     store = _MemoryStageTrackingSettingsStore()
     uc = UpdateStageTrackingSettings(store)
 
     out = uc.execute("hybrid", "0")
 
-    assert out.judge_interval == 4
-    assert store.read().judge_interval == 4
+    assert out.judge_interval == 1
+    assert store.read().judge_interval == 1
 
 
 def test_update_stage_tracking_settings_none_arguments_use_defaults() -> None:

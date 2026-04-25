@@ -79,7 +79,7 @@ def normalize_stage_tracking_settings(
     except (TypeError, ValueError):
         interval = DEFAULT_STAGE_TRACKING_JUDGE_INTERVAL
     if interval < 1:
-        interval = DEFAULT_STAGE_TRACKING_JUDGE_INTERVAL
+        interval = 1
 
     return StageTrackingSettings(mode=raw_mode, judge_interval=interval)  # type: ignore[arg-type]
 

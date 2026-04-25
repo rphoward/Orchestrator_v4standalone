@@ -46,6 +46,9 @@ from orchestrator_v4.core.use_cases.load_interview_session_routing_logs import (
 from orchestrator_v4.core.use_cases.refresh_stage_tracking_before_report import (
     RefreshStageTrackingBeforeReport,
 )
+from orchestrator_v4.core.use_cases.read_session_stage_tracking_log import (
+    ReadSessionStageTrackingLog,
+)
 from orchestrator_v4.core.use_cases.read_agent_overrides import ReadAgentOverrides
 from orchestrator_v4.core.use_cases.stage_tracking_settings import (
     ReadStageTrackingSettings,
@@ -175,6 +178,7 @@ _turn_store = SqliteInterviewSessionTurnStore(
     prompt_cache=_prompt_cache,
     prompt_body_source=_prompt_body_source,
 )
+read_session_stage_tracking_log = ReadSessionStageTrackingLog(_turn_store)
 
 model_registry_store = SqliteModelRegistryStore(resolve_orchestrator_db_path())
 

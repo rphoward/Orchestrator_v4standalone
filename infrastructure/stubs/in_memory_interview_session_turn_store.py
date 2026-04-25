@@ -31,6 +31,7 @@ class _MutableSession:
     stage3_complete: bool
     stage4_complete: bool
     stage_progress_json: str = ""
+    stage_tracking_log_json: str = "[]"
     messages: list[TurnConversationLine] = field(default_factory=list)
     routing_logs: list[TurnRoutingLogLine] = field(default_factory=list)
     agents: tuple[InterviewTurnAgentRosterEntry, ...] = ()
@@ -48,6 +49,7 @@ class _MutableSession:
             routing_logs=tuple(self.routing_logs),
             agents=self.agents,
             stage_progress_json=self.stage_progress_json,
+            stage_tracking_log_json=self.stage_tracking_log_json,
         )
 
 
@@ -66,6 +68,7 @@ class InMemoryInterviewSessionTurnStore(InterviewSessionTurnStore):
             stage3_complete=ctx.stage3_complete,
             stage4_complete=ctx.stage4_complete,
             stage_progress_json=ctx.stage_progress_json,
+            stage_tracking_log_json=ctx.stage_tracking_log_json,
             messages=list(ctx.messages),
             routing_logs=list(ctx.routing_logs),
             agents=ctx.agents,
@@ -115,6 +118,7 @@ class InMemoryInterviewSessionTurnStore(InterviewSessionTurnStore):
         stage_flags: dict[int, bool] | None = None,
         name: str | None = None,
         stage_progress_json: str | None = None,
+        stage_tracking_log_json: str | None = None,
     ) -> None:
         s = self._require(session_id)
         if current_agent_id is not None:
@@ -128,3 +132,5 @@ class InMemoryInterviewSessionTurnStore(InterviewSessionTurnStore):
             s.name = name
         if stage_progress_json is not None:
             s.stage_progress_json = stage_progress_json
+        if stage_tracking_log_json is not None:
+            s.stage_tracking_log_json = stage_tracking_log_json

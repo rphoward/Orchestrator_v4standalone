@@ -26,6 +26,12 @@ from orchestrator_v4.core.entities.stage_progress import (
     record_stage_judge_attempt_json,
     should_run_stage_tracking_judge,
 )
+from orchestrator_v4.core.entities.stage_tracking_turn_snapshot import (
+    JudgeApplicationOutcome,
+    StageTrackingTurnSnapshot,
+    append_capped_stage_tracking_log,
+    compact_evaluated_progress,
+)
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
 from orchestrator_v4.core.ports.interview_stage_completion_judge import (
@@ -35,7 +41,8 @@ from orchestrator_v4.core.ports.stage_tracking_settings_store import (
     StageTrackingSettingsStore,
 )
 from orchestrator_v4.core.use_cases.stage_tracking_judge_runner import (
-    apply_stage_completion_judge,
+    apply_stage_completion_judge_detailed,
+    verdict_to_view,
 )
 
 MANUAL_ROUTING_REASON = "Manual override"
@@ -178,7 +185,8 @@ class ConductManualInterviewTurn:
         )
 
         settings = self._stage_tracking_settings_store.read()
-        new_flags = ctx.stage_flags()
+        flags_before = dict(ctx.stage_flags())
+        new_flags = flags_before
         stage_progress_json = ctx.stage_progress_json
         progress = read_stage_progress(stage_progress_json, agent_id)
         if settings.mode == "hybrid":
@@ -197,14 +205,20 @@ class ConductManualInterviewTurn:
             progress,
             trigger="turn",
         )
+        judge_apply: JudgeApplicationOutcome = "none"
+        verdict_view = None
         if stage_tracking_decision.run_judge:
-            new_flags = apply_stage_completion_judge(
+            detail = apply_stage_completion_judge_detailed(
                 stage_id=agent_id,
                 messages=tuple(messages_full),
                 stage_flags_before=ctx.stage_flags(),
                 stage_completion_judge=self._stage_completion_judge,
                 logger=_LOG,
             )
+            new_flags = detail.stage_flags
+            judge_apply = detail.outcome
+            if detail.verdict is not None:
+                verdict_view = verdict_to_view(detail.verdict)
             if settings.mode == "hybrid":
                 stage_progress_json = record_stage_judge_attempt_json(
                     stage_progress_json,
@@ -224,6 +238,30 @@ class ConductManualInterviewTurn:
             new_name = text[:25] + ("..." if len(text) > 25 else "")
             session_renamed = new_name
 
+        ep = read_stage_progress(stage_progress_json, agent_id)
+        progress_json_updated = (ctx.stage_progress_json or "") != (
+            stage_progress_json or ""
+        )
+        stage_snapshot = StageTrackingTurnSnapshot(
+            turn_endpoint="manual",
+            stage_tracking_mode=settings.mode,
+            routed_stage_id=agent_id,
+            active_stage_pointer_before=ctx.current_agent_id,
+            active_stage_pointer_after=next_current,
+            progress_json_updated=progress_json_updated,
+            evaluated_progress=compact_evaluated_progress(ep),
+            gate_reason=stage_tracking_decision.reason,
+            judge_ran=bool(stage_tracking_decision.run_judge),
+            judge_outcome=judge_apply,
+            verdict=verdict_view,
+            stage_flags_before=flags_before,
+            stage_flags_after=new_flags,
+        )
+        st_log = append_capped_stage_tracking_log(
+            ctx.stage_tracking_log_json,
+            stage_snapshot.to_public_dict(),
+        )
+
         self._turn_store.update_session_state(
             session_id,
             current_agent_id=next_current,
@@ -232,6 +270,7 @@ class ConductManualInterviewTurn:
             stage_progress_json=stage_progress_json
             if stage_progress_json != ctx.stage_progress_json
             else None,
+            stage_tracking_log_json=st_log,
         )
 
         return ManualInterviewTurnResult(
@@ -241,4 +280,5 @@ class ConductManualInterviewTurn:
             routing_reason=MANUAL_ROUTING_REASON,
             session_renamed=session_renamed,
             active_stage_pointer=next_current,
+            stage_tracking=stage_snapshot.to_public_dict(),
         )

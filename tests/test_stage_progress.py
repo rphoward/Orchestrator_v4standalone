@@ -32,6 +32,11 @@ def test_stage_tracking_settings_invalid_values_fall_back() -> None:
     assert settings == StageTrackingSettings(mode="hybrid", judge_interval=4)
 
 
+def test_stage_tracking_settings_low_interval_clamps_to_one() -> None:
+    settings = normalize_stage_tracking_settings("semantic", "0")
+    assert settings == StageTrackingSettings(mode="semantic", judge_interval=1)
+
+
 def test_short_or_test_like_input_is_not_meaningful_evidence() -> None:
     assert is_short_or_test_like_stage_input("test")
     assert is_short_or_test_like_stage_input("ok")
