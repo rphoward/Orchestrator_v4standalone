@@ -28,6 +28,7 @@ runtime_paths.py
 ./core/entities/prompt_template_row.py
 ./core/entities/stage_completion_verdict.py
 ./core/entities/stage_evaluator.py
+./core/entities/stage_progress.py
 ./core/ports/__init__.py
 ./core/ports/agent_configuration_store.py
 ./core/ports/agent_override_reader.py
@@ -41,6 +42,7 @@ runtime_paths.py
 ./core/ports/model_registry_store.py
 ./core/ports/prompt_body_source.py
 ./core/ports/prompt_template_store.py
+./core/ports/stage_tracking_settings_store.py
 ./core/use_cases/__init__.py
 ./core/use_cases/conduct_interview_turn.py
 ./core/use_cases/conduct_manual_interview_turn.py
@@ -55,7 +57,10 @@ runtime_paths.py
 ./core/use_cases/load_interview_session_routing_logs.py
 ./core/use_cases/prompt_template_catalog.py
 ./core/use_cases/read_agent_overrides.py
+./core/use_cases/refresh_stage_tracking_before_report.py
 ./core/use_cases/session_export_v3_format.py
+./core/use_cases/stage_tracking_judge_runner.py
+./core/use_cases/stage_tracking_settings.py
 ./core/use_cases/update_interview_session.py
 ./infrastructure/__init__.py
 ./infrastructure/runtime_executable_layout.py
@@ -72,6 +77,7 @@ runtime_paths.py
 ./infrastructure/persistence/sqlite_model_registry_store.py
 ./infrastructure/persistence/sqlite_orchestrator_connection.py
 ./infrastructure/persistence/sqlite_prompt_template_store.py
+./infrastructure/persistence/sqlite_stage_tracking_settings_store.py
 ./infrastructure/persistence/sqlite_template_aware_prompt_body_source.py
 ./presentation/agent_configuration_routes.py
 ./presentation/app.py
@@ -92,7 +98,9 @@ core/entities/interview_turn.py
 core/entities/model_registry_entry.py
 core/entities/pierce_holt_engine.py
 core/entities/prompt_template_row.py
+core/entities/stage_completion_verdict.py
 core/entities/stage_evaluator.py
+core/entities/stage_progress.py
 core/ports/__init__.py
 core/ports/agent_configuration_store.py
 core/ports/agent_override_reader.py
@@ -102,9 +110,11 @@ core/ports/interview_session_importer.py
 core/ports/interview_session_initializer.py
 core/ports/interview_session_read_port.py
 core/ports/interview_session_turn_store.py
+core/ports/interview_stage_completion_judge.py
 core/ports/model_registry_store.py
 core/ports/prompt_body_source.py
 core/ports/prompt_template_store.py
+core/ports/stage_tracking_settings_store.py
 core/use_cases/__init__.py
 core/use_cases/conduct_interview_turn.py
 core/use_cases/conduct_manual_interview_turn.py
@@ -119,7 +129,10 @@ core/use_cases/load_interview_session_for_export.py
 core/use_cases/load_interview_session_routing_logs.py
 core/use_cases/prompt_template_catalog.py
 core/use_cases/read_agent_overrides.py
+core/use_cases/refresh_stage_tracking_before_report.py
 core/use_cases/session_export_v3_format.py
+core/use_cases/stage_tracking_judge_runner.py
+core/use_cases/stage_tracking_settings.py
 core/use_cases/update_interview_session.py
 infrastructure/__init__.py
 infrastructure/runtime_executable_layout.py
@@ -136,6 +149,7 @@ infrastructure/persistence/sqlite_interview_session_turn_store.py
 infrastructure/persistence/sqlite_model_registry_store.py
 infrastructure/persistence/sqlite_orchestrator_connection.py
 infrastructure/persistence/sqlite_prompt_template_store.py
+infrastructure/persistence/sqlite_stage_tracking_settings_store.py
 infrastructure/persistence/sqlite_template_aware_prompt_body_source.py
 orchestrator_v4.egg-info/PKG-INFO
 orchestrator_v4.egg-info/SOURCES.txt
@@ -151,3 +165,5 @@ presentation/interview_session_routes.py
 presentation/preflight_frozen.py
 presentation/prompt_template_routes.py
 tests/test_core_entities.py
+tests/test_stage_progress.py
+tests/test_stage_tracking_turns.py

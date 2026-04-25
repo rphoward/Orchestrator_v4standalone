@@ -10,6 +10,7 @@ import {
     toggleThinking,
     saveAgentConfig,
     saveRouterModel,
+    saveStageTrackingSettings,
     saveApiKey,
     updateBulkAssignPreview,
     applyBulkModelAssign,
@@ -85,6 +86,7 @@ window.openSettings          = openSettings;
 window.closeSettings         = closeSettings;
 window.switchSettingsTab     = switchSettingsTab;
 window.saveRouterModel       = saveRouterModel;
+window.saveStageTrackingSettings = saveStageTrackingSettings;
 window.saveAgentConfig       = saveAgentConfig;
 window.toggleThinking        = toggleThinking;
 window.renderRegistryTab     = renderRegistryTab;
@@ -120,6 +122,7 @@ export {
     toggleThinking,
     saveAgentConfig,
     saveRouterModel,
+    saveStageTrackingSettings,
     saveApiKey,
     updateBulkAssignPreview,
     applyBulkModelAssign,

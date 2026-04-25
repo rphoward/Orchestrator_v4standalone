@@ -1,7 +1,6 @@
 """API key, model registry, router model, and model-id verify (vertical slice)."""
 
 from __future__ import annotations
-
 from typing import cast
 
 from dotenv import set_key
@@ -17,7 +16,26 @@ from orchestrator_v4.presentation.gemini_env import (
 from orchestrator_v4.presentation.http_helpers import json_body_dict, validation_error_response
 
 
+def _stage_tracking_settings_payload(settings) -> dict[str, object]:
+    return {
+        "stage_tracking_mode": settings.mode,
+        "stage_tracking_judge_interval": settings.judge_interval,
+    }
+
+
 def register_gemini_connection_routes(app: Flask) -> None:
+    @app.route("/api/config/stage-tracking", methods=["GET", "PUT"])
+    def api_config_stage_tracking():
+        if request.method == "GET":
+            settings = bootstrap.read_stage_tracking_settings.execute()
+            return jsonify(_stage_tracking_settings_payload(settings))
+        data = json_body_dict()
+        settings = bootstrap.update_stage_tracking_settings.execute(
+            data.get("stage_tracking_mode"),
+            data.get("stage_tracking_judge_interval"),
+        )
+        return jsonify(_stage_tracking_settings_payload(settings))
+
     @app.route("/api/config/api-key", methods=["GET", "PUT"])
     def api_config_api_key():
         if request.method == "GET":

@@ -29,5 +29,6 @@ class InterviewSessionTurnStore(Protocol):
         current_agent_id: int | None = None,
         stage_flags: dict[int, bool] | None = None,
         name: str | None = None,
+        stage_progress_json: str | None = None,
     ) -> None:
         ...

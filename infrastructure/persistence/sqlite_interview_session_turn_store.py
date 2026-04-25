@@ -70,7 +70,8 @@ class SqliteInterviewSessionTurnStore:
                 """
                 SELECT id, name, current_agent_id,
                        stage1_complete, stage2_complete,
-                       stage3_complete, stage4_complete
+                       stage3_complete, stage4_complete,
+                       stage_progress
                 FROM sessions WHERE id = ?
                 """,
                 (session_id,),
@@ -160,6 +161,7 @@ class SqliteInterviewSessionTurnStore:
             messages=messages,
             routing_logs=routing_logs,
             agents=agents,
+            stage_progress_json=str(session_row["stage_progress"] or ""),
         )
 
     def append_messages(
@@ -200,6 +202,7 @@ class SqliteInterviewSessionTurnStore:
         current_agent_id: int | None = None,
         stage_flags: dict[int, bool] | None = None,
         name: str | None = None,
+        stage_progress_json: str | None = None,
     ) -> None:
         sets: list[str] = []
         params: list[object] = []
@@ -215,6 +218,9 @@ class SqliteInterviewSessionTurnStore:
         if name is not None:
             sets.append("name = ?")
             params.append(name)
+        if stage_progress_json is not None:
+            sets.append("stage_progress = ?")
+            params.append(stage_progress_json)
 
         if not sets:
             return

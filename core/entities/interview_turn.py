@@ -56,6 +56,7 @@ class TurnContext:
     messages: tuple[TurnConversationLine, ...]
     routing_logs: tuple[TurnRoutingLogLine, ...]
     agents: tuple[InterviewTurnAgentRosterEntry, ...]
+    stage_progress_json: str = ""
 
     def stage_flags(self) -> dict[int, bool]:
         return {

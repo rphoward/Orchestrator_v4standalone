@@ -68,6 +68,7 @@ def _init_db_schema(conn: sqlite3.Connection) -> None:
             stage2_complete INTEGER DEFAULT 0,
             stage3_complete INTEGER DEFAULT 0,
             stage4_complete INTEGER DEFAULT 0,
+            stage_progress TEXT DEFAULT '',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -78,6 +79,7 @@ def _init_db_schema(conn: sqlite3.Connection) -> None:
         "ALTER TABLE sessions ADD COLUMN client_name TEXT DEFAULT ''",
         "ALTER TABLE sessions ADD COLUMN current_agent_id INTEGER DEFAULT 1",
         "ALTER TABLE sessions ADD COLUMN summary TEXT DEFAULT ''",
+        "ALTER TABLE sessions ADD COLUMN stage_progress TEXT DEFAULT ''",
     ):
         try:
             cursor.execute(col_sql)

@@ -43,7 +43,14 @@ from orchestrator_v4.core.use_cases.load_interview_session_for_export import Loa
 from orchestrator_v4.core.use_cases.load_interview_session_routing_logs import (
     LoadInterviewSessionRoutingLogs,
 )
+from orchestrator_v4.core.use_cases.refresh_stage_tracking_before_report import (
+    RefreshStageTrackingBeforeReport,
+)
 from orchestrator_v4.core.use_cases.read_agent_overrides import ReadAgentOverrides
+from orchestrator_v4.core.use_cases.stage_tracking_settings import (
+    ReadStageTrackingSettings,
+    UpdateStageTrackingSettings,
+)
 from orchestrator_v4.core.use_cases.update_interview_session import UpdateInterviewSession
 from orchestrator_v4.infrastructure.ai.gemini_interview_llm_gateway import (
     GeminiInterviewLlmGateway,
@@ -69,6 +76,9 @@ from orchestrator_v4.infrastructure.persistence.sqlite_agent_override_reader imp
 )
 from orchestrator_v4.infrastructure.persistence.sqlite_prompt_template_store import (
     SqlitePromptTemplateStore,
+)
+from orchestrator_v4.infrastructure.persistence.sqlite_stage_tracking_settings_store import (
+    SqliteStageTrackingSettingsStore,
 )
 from orchestrator_v4.infrastructure.persistence.sqlite_template_aware_prompt_body_source import (
     SqliteTemplateAwarePromptBodySource,
@@ -127,6 +137,12 @@ agent_config_store = SqliteAgentConfigurationStore(
     resolve_orchestrator_db_path(),
     resolve_prompts_root(),
 )
+
+_stage_tracking_settings_store = SqliteStageTrackingSettingsStore(
+    resolve_orchestrator_db_path()
+)
+read_stage_tracking_settings = ReadStageTrackingSettings(_stage_tracking_settings_store)
+update_stage_tracking_settings = UpdateStageTrackingSettings(_stage_tracking_settings_store)
 
 _prompt_cache = CachedPromptFileReader(resolve_prompts_root())
 _prompt_body_source = SqliteTemplateAwarePromptBodySource(
@@ -188,6 +204,7 @@ def rebind_llm_gateway() -> None:
     and model registry (and env overrides)."""
     global _llm_gateway, _stage_completion_judge, stage_completion_judge
     global conduct_interview_turn, initialize_session, conduct_manual_turn, finalize_session
+    global load_interview_session_for_export, _stage_tracking_refresh
 
     if gemini_api_key_configured and _gemini_api_key:
         rid = _resolved_router_model_id()
@@ -233,14 +250,33 @@ def rebind_llm_gateway() -> None:
         )
 
     stage_completion_judge = _stage_completion_judge
+    _stage_tracking_refresh = RefreshStageTrackingBeforeReport(
+        _turn_store,
+        _stage_completion_judge,
+        _stage_tracking_settings_store,
+    )
+    load_interview_session_for_export = LoadInterviewSessionForExport(
+        _session_reader,
+        _stage_tracking_refresh,
+    )
     conduct_interview_turn = ConductInterviewTurn(
-        _turn_store, _llm_gateway, _stage_completion_judge
+        _turn_store,
+        _llm_gateway,
+        _stage_completion_judge,
+        _stage_tracking_settings_store,
     )
     initialize_session = InitializeInterviewSession(_turn_store, _llm_gateway)
     conduct_manual_turn = ConductManualInterviewTurn(
-        _turn_store, _llm_gateway, _stage_completion_judge
+        _turn_store,
+        _llm_gateway,
+        _stage_completion_judge,
+        _stage_tracking_settings_store,
     )
-    finalize_session = FinalizeInterviewSession(_turn_store, _llm_gateway)
+    finalize_session = FinalizeInterviewSession(
+        _turn_store,
+        _llm_gateway,
+        _stage_tracking_refresh,
+    )
 
 
 rebind_llm_gateway()

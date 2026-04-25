@@ -9,6 +9,9 @@ from orchestrator_v4.core.entities.agent_roster_helpers import (
 from orchestrator_v4.core.entities.interview_turn import ConversationAppend
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
+from orchestrator_v4.core.use_cases.refresh_stage_tracking_before_report import (
+    RefreshStageTrackingBeforeReport,
+)
 
 _MUSCLE_AGENTS = (1, 2, 3, 4)
 _AGENT_NAMES = {
@@ -28,11 +31,15 @@ class FinalizeInterviewSession:
         self,
         turn_store: InterviewSessionTurnStore,
         llm_gateway: InterviewLlmGateway,
+        stage_tracking_refresh: RefreshStageTrackingBeforeReport | None = None,
     ) -> None:
         self._turn_store = turn_store
         self._llm_gateway = llm_gateway
+        self._stage_tracking_refresh = stage_tracking_refresh
 
     def execute(self, session_id: int, *, force: bool = False) -> dict:
+        if self._stage_tracking_refresh is not None:
+            self._stage_tracking_refresh.execute(session_id, trigger="final_report")
         ctx = self._turn_store.load_turn_context(session_id)
 
         if not force:

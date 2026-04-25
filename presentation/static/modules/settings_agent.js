@@ -76,6 +76,42 @@ function _routerModelVerifyNoteHtml(modelId) {
     return html;
 }
 
+function _stageTrackingModeOptions(currentMode) {
+    const selected = String(currentMode || 'hybrid').toLowerCase();
+    const options = [
+        ['hybrid', 'Hybrid'],
+        ['semantic', 'Semantic'],
+        ['off', 'Off'],
+    ];
+    return options.map(([value, label]) => (
+        `<option value="${value}" ${selected === value ? 'selected' : ''}>${label}</option>`
+    )).join('');
+}
+
+/** Maps GET/PUT `/api/config/stage-tracking` JSON to UI state (API uses `stage_*` keys). */
+function _normalizedStageTrackingFromApi(data) {
+    if (!data || typeof data !== 'object') {
+        return { mode: 'hybrid', judge_interval_turns: 4 };
+    }
+    const mode = String(data.stage_tracking_mode ?? data.mode ?? 'hybrid').toLowerCase() || 'hybrid';
+    const rawInterval = data.stage_tracking_judge_interval ?? data.judge_interval_turns;
+    const parsed =
+        rawInterval == null || rawInterval === ''
+            ? 4
+            : Number(rawInterval);
+    const judge_interval_turns =
+        Number.isFinite(parsed) && parsed > 0 ? parsed : 4;
+    return { mode, judge_interval_turns };
+}
+
+function _stageTrackingSummary(settings, prefix = 'Current') {
+    const mode = String(settings?.mode || 'hybrid').toLowerCase();
+    const label = mode === 'semantic' ? 'Semantic' : mode === 'off' ? 'Off' : 'Hybrid';
+    const interval = settings?.judge_interval_turns ?? '';
+    const turnText = String(interval) === '1' ? 'turn' : 'turns';
+    return `${prefix}: ${label}, judge interval ${interval} ${turnText}.`;
+}
+
 /**
  * Human-readable summary of what will run for this agent (model defaults vs overrides).
  */
@@ -234,6 +270,15 @@ export async function renderAgentSettings() {
         rModel = routerData.model || '';
     } catch (err) {}
 
+    let stageTrackingSettings = { mode: 'hybrid', judge_interval_turns: 4 };
+    try {
+        const res = await fetch('/api/config/stage-tracking');
+        if (res.ok) {
+            const stageData = await res.json();
+            stageTrackingSettings = _normalizedStageTrackingFromApi(stageData);
+        }
+    } catch (_) {}
+
     let maskedKey = '';
     try {
         const keyData = await api('/api/config/api-key');
@@ -335,6 +380,36 @@ export async function renderAgentSettings() {
                 The Router strictly forces MINIMAL thinking in the backend for near-instant classification.
             </p>
             ${_routerModelVerifyNoteHtml(rModel)}
+        </div>
+
+        <div class="agent-config-card" style="border-left: 3px solid #7c3aed; margin-bottom: 1.5rem;">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-xl">🧭</span>
+                <span class="font-semibold">Stage Tracking</span>
+                <span class="text-xs text-gray-400">(controls when stage completion is judged)</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <label class="block text-xs text-gray-500">
+                    <span class="block mb-1">Mode</span>
+                    <select id="stageTrackingModeSelect" class="w-full text-xs p-2 border border-gray-200 rounded-md">
+                        ${_stageTrackingModeOptions(stageTrackingSettings.mode)}
+                    </select>
+                </label>
+                <label class="block text-xs text-gray-500">
+                    <span class="block mb-1">Judge interval</span>
+                    <input type="number" id="stageTrackingJudgeIntervalInput"
+                           value="${escapeHtml(String(stageTrackingSettings.judge_interval_turns ?? ''))}"
+                           min="1" step="1"
+                           class="w-full text-xs p-2 border border-gray-200 rounded-md">
+                </label>
+            </div>
+            <p class="text-xs text-gray-400 mb-2">
+                Hybrid: judge after candidate completion, explicit advance, final report/export, or interval.
+            </p>
+            <div class="flex items-center justify-between gap-3">
+                <p id="stageTrackingSaveResult" class="text-[11px] text-gray-500">${escapeHtml(_stageTrackingSummary(stageTrackingSettings))}</p>
+                <button onclick="saveStageTrackingSettings()" class="btn-primary text-xs">Save</button>
+            </div>
         </div>
 
         <div class="agent-config-card" style="border-left: 3px solid #0369a1; margin-bottom: 1.5rem;">
@@ -576,6 +651,28 @@ export async function saveRouterModel() {
         })});
         showStatus('Saved.', '✅');
         scheduleHideStatus(2000);
+    } catch (e) {}
+}
+
+export async function saveStageTrackingSettings() {
+    const modeEl = document.getElementById('stageTrackingModeSelect');
+    const intervalEl = document.getElementById('stageTrackingJudgeIntervalInput');
+    try {
+        const saved = await api('/api/config/stage-tracking', {
+            method: 'PUT',
+            body: JSON.stringify({
+                stage_tracking_mode: modeEl?.value ?? '',
+                stage_tracking_judge_interval: intervalEl?.value ?? '',
+            }),
+        });
+        const norm = _normalizedStageTrackingFromApi(saved);
+        if (modeEl) modeEl.value = norm.mode || 'hybrid';
+        if (intervalEl) intervalEl.value = String(norm.judge_interval_turns ?? '');
+        const result = document.getElementById('stageTrackingSaveResult');
+        const summary = _stageTrackingSummary(norm, 'Saved');
+        if (result) result.textContent = summary;
+        showStatus(summary, '✅');
+        scheduleHideStatus(2500);
     } catch (e) {}
 }
 

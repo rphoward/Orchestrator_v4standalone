@@ -23,13 +23,23 @@ from orchestrator_v4.core.entities.pierce_holt_engine import (
 from orchestrator_v4.core.entities.stage_evaluator import (
     apply_sequential_stage_veto,
     earliest_unfinished_stage,
-    evaluate_stage_completion,
-    merge_stage_completion_verdict_into_flags,
+)
+from orchestrator_v4.core.entities.stage_progress import (
+    advance_stage_progress_json,
+    read_stage_progress,
+    record_stage_judge_attempt_json,
+    should_run_stage_tracking_judge,
 )
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
 from orchestrator_v4.core.ports.interview_stage_completion_judge import (
     InterviewStageCompletionJudge,
+)
+from orchestrator_v4.core.ports.stage_tracking_settings_store import (
+    StageTrackingSettingsStore,
+)
+from orchestrator_v4.core.use_cases.stage_tracking_judge_runner import (
+    apply_stage_completion_judge,
 )
 
 _LOG = logging.getLogger(__name__)
@@ -41,10 +51,12 @@ class ConductInterviewTurn:
         turn_store: InterviewSessionTurnStore,
         llm_gateway: InterviewLlmGateway,
         stage_completion_judge: InterviewStageCompletionJudge,
+        stage_tracking_settings_store: StageTrackingSettingsStore,
     ) -> None:
         self._turn_store = turn_store
         self._llm_gateway = llm_gateway
         self._stage_completion_judge = stage_completion_judge
+        self._stage_tracking_settings_store = stage_tracking_settings_store
 
     def execute(self, session_id: int, user_input: str) -> InterviewTurnResult:
         text = user_input.strip()
@@ -56,9 +68,9 @@ class ConductInterviewTurn:
         # Agent 5 (Grand Synthesis) is manual-only; never hint it to the auto-router.
         agent_hints = {a.id: a.router_hint for a in ctx.agents if not a.is_synthesizer}
         raw = self._llm_gateway.route_intent(text, ctx.current_agent_id, agent_hints)
-        decision = apply_sequential_stage_veto(raw, ctx.stage_flags())
+        routing_decision = apply_sequential_stage_veto(raw, ctx.stage_flags())
 
-        target_agent_id = decision.target_agent_id
+        target_agent_id = routing_decision.target_agent_id
         agent_name = roster_agent_name(ctx.agents, target_agent_id)
 
         self._turn_store.append_routing_log(
@@ -67,7 +79,7 @@ class ConductInterviewTurn:
                 input_text=text,
                 agent_id=target_agent_id,
                 agent_name=agent_name,
-                reason=decision.reason,
+                reason=routing_decision.reason,
             ),
         )
 
@@ -180,31 +192,40 @@ class ConductInterviewTurn:
             )
         )
 
-        # Stage-completion decision: judge is authoritative; heuristic is the
-        # fallback when the adapter returns a judge_error verdict or raises.
-        # See .cursor/plans/stage-completion-judge_*.plan.md slice 9.
-        try:
-            verdict = self._stage_completion_judge.judge_stage_completion(
+        settings = self._stage_tracking_settings_store.read()
+        new_flags = ctx.stage_flags()
+        stage_progress_json = ctx.stage_progress_json
+        progress = read_stage_progress(stage_progress_json, target_agent_id)
+        if settings.mode == "hybrid":
+            stage_progress_json, progress = advance_stage_progress_json(
+                stage_progress_json,
+                target_agent_id,
+                tuple(messages_full),
+                text,
+            )
+
+        stage_tracking_decision = should_run_stage_tracking_judge(
+            settings,
+            target_agent_id,
+            tuple(messages_full),
+            text,
+            progress,
+            trigger="turn",
+        )
+        if stage_tracking_decision.run_judge:
+            new_flags = apply_stage_completion_judge(
                 stage_id=target_agent_id,
                 messages=tuple(messages_full),
                 stage_flags_before=ctx.stage_flags(),
+                stage_completion_judge=self._stage_completion_judge,
+                logger=_LOG,
             )
-            if verdict.reason.startswith("judge_error:"):
-                new_flags = evaluate_stage_completion(
-                    target_agent_id, tuple(messages_full), ctx.stage_flags()
+            if settings.mode == "hybrid":
+                stage_progress_json = record_stage_judge_attempt_json(
+                    stage_progress_json,
+                    target_agent_id,
+                    tuple(messages_full),
                 )
-            else:
-                new_flags = merge_stage_completion_verdict_into_flags(
-                    verdict, ctx.stage_flags()
-                )
-        except Exception:
-            _LOG.warning(
-                "stage_completion_judge raised; falling back to heuristic",
-                exc_info=True,
-            )
-            new_flags = evaluate_stage_completion(
-                target_agent_id, tuple(messages_full), ctx.stage_flags()
-            )
 
         # session.current_agent_id holds the active stage pointer (earliest
         # unfinished stage 1..4); recompute it from the new stage flags every
@@ -222,13 +243,16 @@ class ConductInterviewTurn:
             current_agent_id=next_current,
             stage_flags=new_flags,
             name=new_name if session_renamed else None,
+            stage_progress_json=stage_progress_json
+            if stage_progress_json != ctx.stage_progress_json
+            else None,
         )
 
         return InterviewTurnResult(
             agent_id=target_agent_id,
             agent_name=agent_name,
-            routing_reason=decision.reason,
-            workflow_status=decision.workflow_status,
+            routing_reason=routing_decision.reason,
+            workflow_status=routing_decision.workflow_status,
             response=reply,
             psychological_phase=phase,
             session_renamed=session_renamed,
