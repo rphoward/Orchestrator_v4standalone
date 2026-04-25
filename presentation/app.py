@@ -24,6 +24,9 @@ from orchestrator_v4.presentation.gemini_connection_routes import (
 from orchestrator_v4.presentation.interview_session_routes import (
     register_interview_session_routes,
 )
+from orchestrator_v4.presentation.interview_stage_tracking_settings_routes import (
+    register_interview_stage_tracking_settings_routes,
+)
 from orchestrator_v4.presentation.prompt_template_routes import (
     register_prompt_template_routes,
 )
@@ -43,6 +46,7 @@ app.logger.setLevel(logging.INFO)
 
 register_interview_session_routes(app)
 register_prompt_template_routes(app)
+register_interview_stage_tracking_settings_routes(app)
 register_gemini_connection_routes(app)
 register_agent_configuration_routes(app)
 

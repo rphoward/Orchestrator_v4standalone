@@ -69,7 +69,7 @@ The daily-driver parchment work landed, but two follow-ups surfaced:
 ## Out of scope (intentionally deferred)
 
 - Do NOT change Gemini model IDs, `include_thoughts` defaults, or routing logic in this pass. Logs first; the targeted fix is the next session's job.
-- Do NOT touch [proposedgemini_interview_llm_gateway.py](../../proposedgemini_interview_llm_gateway.py); unused sketch.
+- Do NOT touch [proposedgemini_interview_llm_gateway.py](../../docs/proposedgemini_interview_llm_gateway.py); unused sketch.
 - No JS behavior changes; no Flask route changes; no Tailwind build migration.
 
 ## Verify (done in this pass)

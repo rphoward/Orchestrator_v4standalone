@@ -8,7 +8,10 @@ Settings UI.
 from flask import Flask
 
 from orchestrator_v4.core.entities.stage_progress import StageTrackingSettings
-from orchestrator_v4.presentation import gemini_connection_routes
+from orchestrator_v4.presentation import (
+    interview_session_routes,
+    interview_stage_tracking_settings_routes,
+)
 
 
 class _ReadStageTrackingSettings:
@@ -30,7 +33,7 @@ class _UpdateStageTrackingSettings:
 
 
 def test_stage_tracking_settings_payload_supports_plan_and_ui_names() -> None:
-    payload = gemini_connection_routes._stage_tracking_settings_payload(
+    payload = interview_stage_tracking_settings_routes._stage_tracking_settings_payload(
         StageTrackingSettings(mode="off", judge_interval=3)
     )
     assert payload == {
@@ -44,17 +47,19 @@ def test_stage_tracking_settings_payload_supports_plan_and_ui_names() -> None:
 def test_stage_tracking_settings_route_accepts_plan_key_names(monkeypatch) -> None:
     update = _UpdateStageTrackingSettings()
     monkeypatch.setattr(
-        gemini_connection_routes.bootstrap,
+        interview_stage_tracking_settings_routes.bootstrap,
         "read_stage_tracking_settings",
         _ReadStageTrackingSettings(),
     )
     monkeypatch.setattr(
-        gemini_connection_routes.bootstrap,
+        interview_stage_tracking_settings_routes.bootstrap,
         "update_stage_tracking_settings",
         update,
     )
     app = Flask(__name__)
-    gemini_connection_routes.register_gemini_connection_routes(app)
+    interview_stage_tracking_settings_routes.register_interview_stage_tracking_settings_routes(
+        app
+    )
 
     response = app.test_client().put(
         "/api/config/stage-tracking",
@@ -69,3 +74,32 @@ def test_stage_tracking_settings_route_accepts_plan_key_names(monkeypatch) -> No
         "mode": "semantic",
         "judge_interval_turns": 2,
     }
+
+
+def test_get_session_stage_tracking_json_shape(monkeypatch) -> None:
+    """Route must see the stub: patch the module the handler resolves at request time.
+
+    Importing ``presentation.app`` registers all routes first; patching a different
+    import of ``bootstrap`` afterward is fragile. Patch ``interview_session_routes.bootstrap``
+    (same object the GET handler's globals use), then register only session routes
+    on a fresh Flask app — same pattern as ``test_stage_tracking_settings_route_accepts_plan_key_names``.
+    """
+
+    class _FakeReadLog:
+        def execute(self, session_id: int) -> dict[str, object]:
+            return {"entries": [{"turn_endpoint": "auto", "routed_stage_id": 1}]}
+
+    monkeypatch.setattr(
+        interview_session_routes.bootstrap,
+        "read_session_stage_tracking_log",
+        _FakeReadLog(),
+    )
+    app = Flask(__name__)
+    interview_session_routes.register_interview_session_routes(app)
+    response = app.test_client().get("/api/sessions/1/stage-tracking")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "entries" in data
+    assert data["entries"] == [
+        {"turn_endpoint": "auto", "routed_stage_id": 1},
+    ]

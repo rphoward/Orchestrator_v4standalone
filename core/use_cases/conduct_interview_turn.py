@@ -20,22 +20,7 @@ from orchestrator_v4.core.entities.pierce_holt_engine import (
     get_tone_directive,
     psychological_phase_value,
 )
-from orchestrator_v4.core.entities.stage_evaluator import (
-    apply_sequential_stage_veto,
-    earliest_unfinished_stage,
-)
-from orchestrator_v4.core.entities.stage_progress import (
-    advance_stage_progress_json,
-    read_stage_progress,
-    record_stage_judge_attempt_json,
-    should_run_stage_tracking_judge,
-)
-from orchestrator_v4.core.entities.stage_tracking_turn_snapshot import (
-    JudgeApplicationOutcome,
-    StageTrackingTurnSnapshot,
-    append_capped_stage_tracking_log,
-    compact_evaluated_progress,
-)
+from orchestrator_v4.core.entities.stage_evaluator import apply_sequential_stage_veto
 from orchestrator_v4.core.ports.interview_llm_gateway import InterviewLlmGateway
 from orchestrator_v4.core.ports.interview_session_turn_store import InterviewSessionTurnStore
 from orchestrator_v4.core.ports.interview_stage_completion_judge import (
@@ -44,9 +29,8 @@ from orchestrator_v4.core.ports.interview_stage_completion_judge import (
 from orchestrator_v4.core.ports.stage_tracking_settings_store import (
     StageTrackingSettingsStore,
 )
-from orchestrator_v4.core.use_cases.stage_tracking_judge_runner import (
-    apply_stage_completion_judge_detailed,
-    verdict_to_view,
+from orchestrator_v4.core.use_cases.finalize_chat_turn_stage_tracking import (
+    finalize_chat_turn_stage_tracking,
 )
 
 _LOG = logging.getLogger(__name__)
@@ -199,92 +183,26 @@ class ConductInterviewTurn:
             )
         )
 
-        settings = self._stage_tracking_settings_store.read()
-        flags_before = dict(ctx.stage_flags())
-        new_flags = flags_before
-        stage_progress_json = ctx.stage_progress_json
-        progress = read_stage_progress(stage_progress_json, target_agent_id)
-        if settings.mode == "hybrid":
-            stage_progress_json, progress = advance_stage_progress_json(
-                stage_progress_json,
-                target_agent_id,
-                tuple(messages_full),
-                text,
-            )
-
-        stage_tracking_decision = should_run_stage_tracking_judge(
-            settings,
-            target_agent_id,
-            tuple(messages_full),
-            text,
-            progress,
-            trigger="turn",
-        )
-        judge_apply: JudgeApplicationOutcome = "none"
-        verdict_view = None
-        if stage_tracking_decision.run_judge:
-            detail = apply_stage_completion_judge_detailed(
-                stage_id=target_agent_id,
-                messages=tuple(messages_full),
-                stage_flags_before=ctx.stage_flags(),
-                stage_completion_judge=self._stage_completion_judge,
-                logger=_LOG,
-            )
-            new_flags = detail.stage_flags
-            judge_apply = detail.outcome
-            if detail.verdict is not None:
-                verdict_view = verdict_to_view(detail.verdict)
-            if settings.mode == "hybrid":
-                stage_progress_json = record_stage_judge_attempt_json(
-                    stage_progress_json,
-                    target_agent_id,
-                    tuple(messages_full),
-                )
-
-        # session.current_agent_id holds the active stage pointer (earliest
-        # unfinished stage 1..4); recompute it from the new stage flags every
-        # turn. Who handled THIS turn is still `target_agent_id` in the result.
-        next_current = earliest_unfinished_stage(new_flags)
-
-        session_renamed: str | None = None
-        new_name = ctx.name
-        if ctx.name == "New Session":
-            new_name = text[:25] + ("..." if len(text) > 25 else "")
-            session_renamed = new_name
-
-        ep = read_stage_progress(stage_progress_json, target_agent_id)
-        progress_json_updated = (ctx.stage_progress_json or "") != (
-            stage_progress_json or ""
-        )
-        stage_snapshot = StageTrackingTurnSnapshot(
+        st = finalize_chat_turn_stage_tracking(
+            ctx=ctx,
+            acting_agent_id=target_agent_id,
+            messages_full=messages_full,
+            user_input=text,
             turn_endpoint="auto",
-            stage_tracking_mode=settings.mode,
-            routed_stage_id=target_agent_id,
-            active_stage_pointer_before=ctx.current_agent_id,
-            active_stage_pointer_after=next_current,
-            progress_json_updated=progress_json_updated,
-            evaluated_progress=compact_evaluated_progress(ep),
-            gate_reason=stage_tracking_decision.reason,
-            judge_ran=bool(stage_tracking_decision.run_judge),
-            judge_outcome=judge_apply,
-            verdict=verdict_view,
-            stage_flags_before=flags_before,
-            stage_flags_after=new_flags,
-        )
-        st_log = append_capped_stage_tracking_log(
-            ctx.stage_tracking_log_json,
-            stage_snapshot.to_public_dict(),
+            settings_store=self._stage_tracking_settings_store,
+            stage_completion_judge=self._stage_completion_judge,
+            logger=_LOG,
         )
 
         self._turn_store.update_session_state(
             session_id,
-            current_agent_id=next_current,
-            stage_flags=new_flags,
-            name=new_name if session_renamed else None,
-            stage_progress_json=stage_progress_json
-            if stage_progress_json != ctx.stage_progress_json
+            current_agent_id=st.next_current,
+            stage_flags=st.new_flags,
+            name=st.new_name if st.session_renamed else None,
+            stage_progress_json=st.stage_progress_json
+            if st.stage_progress_json != ctx.stage_progress_json
             else None,
-            stage_tracking_log_json=st_log,
+            stage_tracking_log_json=st.st_log,
         )
 
         return InterviewTurnResult(
@@ -294,7 +212,7 @@ class ConductInterviewTurn:
             workflow_status=routing_decision.workflow_status,
             response=reply,
             psychological_phase=phase,
-            session_renamed=session_renamed,
-            active_stage_pointer=next_current,
-            stage_tracking=stage_snapshot.to_public_dict(),
+            session_renamed=st.session_renamed,
+            active_stage_pointer=st.next_current,
+            stage_tracking=st.stage_tracking,
         )

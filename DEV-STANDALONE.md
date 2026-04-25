@@ -22,6 +22,7 @@
 ## Python layout (why `run_dev.py` exists)
 
 - The importable package name is **`orchestrator_v4`**, mapped to **this directory** via `pyproject.toml` (`package-dir`). On disk you see `core/`, `presentation/`, … at the **repository root**, not a nested `orchestrator_v4/` folder.
+- Two old root-level prototype files (`proposedpierce_holt.py`, `proposedgemini_interview_llm_gateway.py`) live under **`docs/`** for historical reading only. What you run is **`orchestrator_v4`** wired from **`bootstrap.py`**, not those sketches.
 - For **`python -m orchestrator_v4.…`** to resolve, the child process **`cwd`** must be the directory **that setuptools considers the package parent**—**`run_dev.py`** sets that up (see its docstring).
 - **`run_dev.py`** runs **`python -m orchestrator_v4.presentation.app`** (or **`python -m orchestrator_v4.bootstrap_smoke`** with **`--smoke`**). It uses the **`.venv`** interpreter at the repo root when present. For this **flat** `package-dir` layout it also runs **`uv pip install -e .`** (when **`uv`** is on `PATH`) so **`import orchestrator_v4`** resolves the same way as a nested folder layout. **PyInstaller** or other frozen entrypoints are **out of scope** for this standalone repo unless you add them here.
 

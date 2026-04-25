@@ -3,16 +3,12 @@ README.md
 __init__.py
 bootstrap.py
 bootstrap_smoke.py
-proposedgemini_interview_llm_gateway.py
-proposedpierce_holt.py
 pyproject.toml
 run_dev.py
 runtime_paths.py
 ./__init__.py
 ./bootstrap.py
 ./bootstrap_smoke.py
-./proposedgemini_interview_llm_gateway.py
-./proposedpierce_holt.py
 ./run_dev.py
 ./runtime_paths.py
 ./core/__init__.py
@@ -49,6 +45,7 @@ runtime_paths.py
 ./core/use_cases/conduct_manual_interview_turn.py
 ./core/use_cases/create_interview_session.py
 ./core/use_cases/delete_interview_session.py
+./core/use_cases/finalize_chat_turn_stage_tracking.py
 ./core/use_cases/finalize_interview_session.py
 ./core/use_cases/initialize_interview_session.py
 ./core/use_cases/list_interview_sessions.py
@@ -87,6 +84,7 @@ runtime_paths.py
 ./presentation/gemini_env.py
 ./presentation/http_helpers.py
 ./presentation/interview_session_routes.py
+./presentation/interview_stage_tracking_settings_routes.py
 ./presentation/preflight_frozen.py
 ./presentation/prompt_template_routes.py
 core/__init__.py
@@ -123,6 +121,7 @@ core/use_cases/conduct_interview_turn.py
 core/use_cases/conduct_manual_interview_turn.py
 core/use_cases/create_interview_session.py
 core/use_cases/delete_interview_session.py
+core/use_cases/finalize_chat_turn_stage_tracking.py
 core/use_cases/finalize_interview_session.py
 core/use_cases/initialize_interview_session.py
 core/use_cases/list_interview_sessions.py
@@ -166,6 +165,7 @@ presentation/gemini_connection_routes.py
 presentation/gemini_env.py
 presentation/http_helpers.py
 presentation/interview_session_routes.py
+presentation/interview_stage_tracking_settings_routes.py
 presentation/preflight_frozen.py
 presentation/prompt_template_routes.py
 tests/test_core_entities.py

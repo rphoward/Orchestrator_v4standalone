@@ -60,7 +60,7 @@ If none of the above matches, copy the log block into the chat and ask for a tar
 ## Guardrails
 
 - Do not change model IDs or routing control flow without evidence. The purpose of this pass was to install evidence, not to fix blind.
-- Do not touch [proposedgemini_interview_llm_gateway.py](../proposedgemini_interview_llm_gateway.py); it is an unused sketch.
+- Do not touch [proposedgemini_interview_llm_gateway.py](proposedgemini_interview_llm_gateway.py) in this folder; it is an unused sketch.
 - After the real fix: bump `presentation/static/index.html` `style.css?v=` if you edit CSS (you likely won't), run `python run_dev.py --smoke` and `pytest -q`, and append a bullet to **Recent landings** in [docs/HANDOFF.md](HANDOFF.md).
 
 ## One more thing
